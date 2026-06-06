@@ -1,0 +1,9 @@
+venv/
+.env
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+uvicorn_out.txt
+uvicorn_err.txt
+.claude/
