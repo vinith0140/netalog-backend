@@ -1,0 +1,102 @@
+
+======================================================================
+Run started: 2026-06-07T16:34:16.766735
+======================================================================
+{"state_id": 1, "name": "Andhra Pradesh", "url": "https://en.wikipedia.org/wiki/Fourth_N._Chandrababu_Naidu_ministry", "error": "Ministers page unreachable: Client error '403 Forbidden' for url 'https://en.wikipedia.org/wiki/Fourth_N._Chandrababu_Naidu_ministry'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403", "elapsed_s": 2.5}
+{"state_id": 2, "name": "Arunachal Pradesh", "url": "https://en.wikipedia.org/wiki/Fifth_Pema_Khandu_ministry", "error": "Ministers page unreachable: Client error '403 Forbidden' for url 'https://en.wikipedia.org/wiki/Fifth_Pema_Khandu_ministry'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403", "elapsed_s": 0.6}
+{"state_id": 3, "name": "Assam", "url": "https://en.wikipedia.org/wiki/First_Sarma_ministry", "error": "Ministers page unreachable: Client error '403 Forbidden' for url 'https://en.wikipedia.org/wiki/First_Sarma_ministry'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403", "elapsed_s": 0.6}
+{"state_id": 4, "name": "Bihar", "url": "https://en.wikipedia.org/wiki/Seventh_Nitish_Kumar_ministry", "error": "Ministers page unreachable: Client error '403 Forbidden' for url 'https://en.wikipedia.org/wiki/Seventh_Nitish_Kumar_ministry'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403", "elapsed_s": 0.5}
+{"state_id": 5, "name": "Chhattisgarh", "url": "https://en.wikipedia.org/wiki/Sai_ministry", "error": "Ministers page unreachable: Client error '403 Forbidden' for url 'https://en.wikipedia.org/wiki/Sai_ministry'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403", "elapsed_s": 0.6}
+{"state_id": 6, "name": "Goa", "url": "https://en.wikipedia.org/wiki/Second_Sawant_ministry", "error": "Ministers page unreachable: Client error '403 Forbidden' for url 'https://en.wikipedia.org/wiki/Second_Sawant_ministry'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403", "elapsed_s": 0.6}
+{"state_id": 7, "name": "Gujarat", "url": "https://en.wikipedia.org/wiki/Second_Bhupendrabhai_Patel_ministry", "error": "Ministers page unreachable: Client error '403 Forbidden' for url 'https://en.wikipedia.org/wiki/Second_Bhupendrabhai_Patel_ministry'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403", "elapsed_s": 0.6}
+{"state_id": 8, "name": "Haryana", "url": "https://en.wikipedia.org/wiki/Nayab_Singh_Saini_ministry", "error": "Ministers page unreachable: Client error '403 Forbidden' for url 'https://en.wikipedia.org/wiki/Nayab_Singh_Saini_ministry'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403", "elapsed_s": 0.6}
+{"state_id": 9, "name": "Himachal Pradesh", "url": "https://en.wikipedia.org/wiki/Sukhu_ministry", "error": "Ministers page unreachable: Client error '403 Forbidden' for url 'https://en.wikipedia.org/wiki/Sukhu_ministry'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403", "elapsed_s": 0.6}
+{"state_id": 10, "name": "Jharkhand", "url": "https://en.wikipedia.org/wiki/Third_Hemant_Soren_ministry", "error": "Ministers page unreachable: Client error '403 Forbidden' for url 'https://en.wikipedia.org/wiki/Third_Hemant_Soren_ministry'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403", "elapsed_s": 0.5}
+{"state_id": 11, "name": "Karnataka", "url": "https://en.wikipedia.org/wiki/Second_Siddaramaiah_ministry", "error": "Ministers page unreachable: Client error '403 Forbidden' for url 'https://en.wikipedia.org/wiki/Second_Siddaramaiah_ministry'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403", "elapsed_s": 0.5}
+{"state_id": 12, "name": "Kerala", "url": "https://en.wikipedia.org/wiki/Second_Vijayan_ministry", "error": "Ministers page unreachable: Client error '403 Forbidden' for url 'https://en.wikipedia.org/wiki/Second_Vijayan_ministry'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403", "elapsed_s": 0.5}
+{"state_id": 13, "name": "Madhya Pradesh", "url": "https://en.wikipedia.org/wiki/Mohan_Yadav_ministry", "error": "Ministers page unreachable: Client error '403 Forbidden' for url 'https://en.wikipedia.org/wiki/Mohan_Yadav_ministry'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403", "elapsed_s": 0.6}
+{"state_id": 14, "name": "Maharashtra", "url": "https://en.wikipedia.org/wiki/Third_Fadnavis_ministry", "error": "Ministers page unreachable: Client error '403 Forbidden' for url 'https://en.wikipedia.org/wiki/Third_Fadnavis_ministry'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403", "elapsed_s": 0.6}
+{"state_id": 15, "name": "Manipur", "url": "https://en.wikipedia.org/wiki/Second_N._Biren_Singh_ministry", "error": "Ministers page unreachable: Client error '403 Forbidden' for url 'https://en.wikipedia.org/wiki/Second_N._Biren_Singh_ministry'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403", "elapsed_s": 0.5}
+{"state_id": 16, "name": "Meghalaya", "url": "https://en.wikipedia.org/wiki/Second_Conrad_Sangma_ministry", "error": "Ministers page unreachable: Client error '403 Forbidden' for url 'https://en.wikipedia.org/wiki/Second_Conrad_Sangma_ministry'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403", "elapsed_s": 0.6}
+{"state_id": 17, "name": "Mizoram", "url": "https://en.wikipedia.org/wiki/Lalduhoma_ministry", "error": "Ministers page unreachable: Client error '403 Forbidden' for url 'https://en.wikipedia.org/wiki/Lalduhoma_ministry'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403", "elapsed_s": 0.5}
+{"state_id": 18, "name": "Nagaland", "url": "https://en.wikipedia.org/wiki/Neiphiu_Rio_ministry", "error": "Ministers page unreachable: Client error '403 Forbidden' for url 'https://en.wikipedia.org/wiki/Neiphiu_Rio_ministry'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403", "elapsed_s": 0.6}
+{"state_id": 19, "name": "Odisha", "url": "https://en.wikipedia.org/wiki/Mohan_Charan_Majhi_ministry", "error": "Ministers page unreachable: Client error '403 Forbidden' for url 'https://en.wikipedia.org/wiki/Mohan_Charan_Majhi_ministry'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403", "elapsed_s": 0.6}
+{"state_id": 20, "name": "Punjab", "url": "https://en.wikipedia.org/wiki/Mann_ministry", "error": "Ministers page unreachable: Client error '403 Forbidden' for url 'https://en.wikipedia.org/wiki/Mann_ministry'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403", "elapsed_s": 0.6}
+{"state_id": 21, "name": "Rajasthan", "url": "https://en.wikipedia.org/wiki/Bhajan_Lal_Sharma_ministry", "error": "Ministers page unreachable: Client error '403 Forbidden' for url 'https://en.wikipedia.org/wiki/Bhajan_Lal_Sharma_ministry'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403", "elapsed_s": 0.5}
+{"state_id": 22, "name": "Sikkim", "url": "https://en.wikipedia.org/wiki/Second_Tamang_ministry", "error": "Ministers page unreachable: Client error '403 Forbidden' for url 'https://en.wikipedia.org/wiki/Second_Tamang_ministry'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403", "elapsed_s": 0.6}
+{"state_id": 23, "name": "Tamil Nadu", "url": "https://en.wikipedia.org/wiki/M._K._Stalin_ministry", "error": "Ministers page unreachable: Client error '403 Forbidden' for url 'https://en.wikipedia.org/wiki/M._K._Stalin_ministry'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403", "elapsed_s": 0.5}
+{"state_id": 24, "name": "Telangana", "url": "https://telangana.gov.in/government/council-of-ministers/", "matched": 16, "total": 16, "elapsed_s": 5.9}
+{"state_id": 25, "name": "Tripura", "url": "https://en.wikipedia.org/wiki/Second_Saha_ministry", "error": "Ministers page unreachable: Client error '403 Forbidden' for url 'https://en.wikipedia.org/wiki/Second_Saha_ministry'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403", "elapsed_s": 0.5}
+{"state_id": 26, "name": "Uttar Pradesh", "url": "https://en.wikipedia.org/wiki/Second_Yogi_Adityanath_ministry", "error": "Ministers page unreachable: Client error '403 Forbidden' for url 'https://en.wikipedia.org/wiki/Second_Yogi_Adityanath_ministry'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403", "elapsed_s": 0.5}
+{"state_id": 27, "name": "Uttarakhand", "url": "https://en.wikipedia.org/wiki/Second_Dhami_ministry", "error": "Ministers page unreachable: Client error '403 Forbidden' for url 'https://en.wikipedia.org/wiki/Second_Dhami_ministry'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403", "elapsed_s": 0.6}
+{"state_id": 28, "name": "West Bengal", "url": "https://en.wikipedia.org/wiki/Third_Mamata_Banerjee_ministry", "error": "Ministers page unreachable: Client error '403 Forbidden' for url 'https://en.wikipedia.org/wiki/Third_Mamata_Banerjee_ministry'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403", "elapsed_s": 0.5}
+{"state_id": 29, "name": "Delhi", "url": "https://en.wikipedia.org/wiki/Rekha_Gupta_ministry", "error": "Ministers page unreachable: Client error '403 Forbidden' for url 'https://en.wikipedia.org/wiki/Rekha_Gupta_ministry'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403", "elapsed_s": 0.6}
+{"state_id": 30, "name": "Jammu & Kashmir", "url": "https://en.wikipedia.org/wiki/Omar_Abdullah_ministry", "error": "Ministers page unreachable: Client error '403 Forbidden' for url 'https://en.wikipedia.org/wiki/Omar_Abdullah_ministry'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403", "elapsed_s": 0.5}
+
+======================================================================
+Run started: 2026-06-07T16:35:49.608944
+======================================================================
+{"state_id": 1, "name": "Andhra Pradesh", "url": "https://en.wikipedia.org/wiki/Fourth_N._Chandrababu_Naidu_ministry", "matched": 24, "total": 25, "elapsed_s": 5.4}
+{"state_id": 2, "name": "Arunachal Pradesh", "url": "https://en.wikipedia.org/wiki/Fifth_Pema_Khandu_ministry", "matched": 12, "total": 12, "elapsed_s": 2.2}
+{"state_id": 3, "name": "Assam", "url": "https://en.wikipedia.org/wiki/First_Sarma_ministry", "matched": 40, "total": 93, "elapsed_s": 9.4}
+{"state_id": 4, "name": "Bihar", "url": "https://en.wikipedia.org/wiki/Seventh_Nitish_Kumar_ministry", "matched": 18, "total": 57, "elapsed_s": 7.6}
+{"state_id": 5, "name": "Chhattisgarh", "url": "https://en.wikipedia.org/wiki/Sai_ministry", "matched": 11, "total": 15, "elapsed_s": 3.0}
+{"state_id": 6, "name": "Goa", "url": "https://en.wikipedia.org/wiki/Second_Sawant_ministry", "error": "Ministers page unreachable: Client error '404 Not Found' for url 'https://en.wikipedia.org/wiki/Second_Sawant_ministry'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/404", "elapsed_s": 1.4}
+{"state_id": 7, "name": "Gujarat", "url": "https://en.wikipedia.org/wiki/Second_Bhupendrabhai_Patel_ministry", "matched": 4, "total": 58, "elapsed_s": 7.0}
+{"state_id": 8, "name": "Haryana", "url": "https://en.wikipedia.org/wiki/Nayab_Singh_Saini_ministry", "matched": 0, "total": 0, "elapsed_s": 1.4}
+{"state_id": 9, "name": "Himachal Pradesh", "url": "https://en.wikipedia.org/wiki/Sukhu_ministry", "matched": 10, "total": 11, "elapsed_s": 1.6}
+{"state_id": 10, "name": "Jharkhand", "url": "https://en.wikipedia.org/wiki/Third_Hemant_Soren_ministry", "matched": 8, "total": 13, "elapsed_s": 2.4}
+{"state_id": 11, "name": "Karnataka", "url": "https://en.wikipedia.org/wiki/Second_Siddaramaiah_ministry", "matched": 24, "total": 32, "elapsed_s": 6.4}
+{"state_id": 12, "name": "Kerala", "url": "https://en.wikipedia.org/wiki/Second_Vijayan_ministry", "matched": 10, "total": 21, "elapsed_s": 3.5}
+{"state_id": 13, "name": "Madhya Pradesh", "url": "https://en.wikipedia.org/wiki/Mohan_Yadav_ministry", "matched": 17, "total": 22, "elapsed_s": 3.5}
+{"state_id": 14, "name": "Maharashtra", "url": "https://en.wikipedia.org/wiki/Third_Fadnavis_ministry", "matched": 10, "total": 54, "elapsed_s": 8.1}
+{"state_id": 15, "name": "Manipur", "url": "https://en.wikipedia.org/wiki/Second_N._Biren_Singh_ministry", "matched": 9, "total": 12, "elapsed_s": 2.2}
+{"state_id": 16, "name": "Meghalaya", "url": "https://en.wikipedia.org/wiki/Second_Conrad_Sangma_ministry", "matched": 17, "total": 52, "elapsed_s": 6.4}
+{"state_id": 17, "name": "Mizoram", "url": "https://en.wikipedia.org/wiki/Lalduhoma_ministry", "matched": 7, "total": 8, "elapsed_s": 1.9}
+{"state_id": 18, "name": "Nagaland", "url": "https://en.wikipedia.org/wiki/Neiphiu_Rio_ministry", "matched": 0, "total": 0, "elapsed_s": 0.9}
+{"state_id": 19, "name": "Odisha", "url": "https://en.wikipedia.org/wiki/Mohan_Charan_Majhi_ministry", "matched": 0, "total": 0, "elapsed_s": 0.7}
+{"state_id": 20, "name": "Punjab", "url": "https://en.wikipedia.org/wiki/Mann_ministry", "matched": 11, "total": 16, "elapsed_s": 2.3}
+{"state_id": 21, "name": "Rajasthan", "url": "https://en.wikipedia.org/wiki/Bhajan_Lal_Sharma_ministry", "matched": 9, "total": 15, "elapsed_s": 2.4}
+{"state_id": 22, "name": "Sikkim", "url": "https://en.wikipedia.org/wiki/Second_Tamang_ministry", "matched": 12, "total": 12, "elapsed_s": 2.2}
+{"state_id": 23, "name": "Tamil Nadu", "url": "https://en.wikipedia.org/wiki/M._K._Stalin_ministry", "matched": 28, "total": 35, "elapsed_s": 7.2}
+{"state_id": 24, "name": "Telangana", "url": "https://telangana.gov.in/government/council-of-ministers/", "matched": 16, "total": 16, "elapsed_s": 6.1}
+{"state_id": 25, "name": "Tripura", "url": "https://en.wikipedia.org/wiki/Second_Saha_ministry", "matched": 12, "total": 12, "elapsed_s": 2.2}
+{"state_id": 26, "name": "Uttar Pradesh", "url": "https://en.wikipedia.org/wiki/Second_Yogi_Adityanath_ministry", "matched": 14, "total": 29, "elapsed_s": 3.9}
+{"state_id": 27, "name": "Uttarakhand", "url": "https://en.wikipedia.org/wiki/Second_Dhami_ministry", "matched": 11, "total": 13, "elapsed_s": 2.3}
+{"state_id": 28, "name": "West Bengal", "url": "https://en.wikipedia.org/wiki/Third_Mamata_Banerjee_ministry", "matched": 38, "total": 39, "elapsed_s": 5.2}
+{"state_id": 29, "name": "Delhi", "url": "https://en.wikipedia.org/wiki/Rekha_Gupta_ministry", "matched": 6, "total": 7, "elapsed_s": 2.0}
+{"state_id": 30, "name": "Jammu & Kashmir", "url": "https://en.wikipedia.org/wiki/Omar_Abdullah_ministry", "matched": 0, "total": 0, "elapsed_s": 0.9}
+
+======================================================================
+Run started: 2026-06-07T16:42:02.182001
+======================================================================
+{"state_id": 1, "name": "Andhra Pradesh", "url": "https://en.wikipedia.org/wiki/Fourth_N._Chandrababu_Naidu_ministry", "matched": 25, "total": 25, "elapsed_s": 5.7}
+{"state_id": 2, "name": "Arunachal Pradesh", "url": "https://en.wikipedia.org/wiki/Fifth_Pema_Khandu_ministry", "matched": 12, "total": 12, "elapsed_s": 1.8}
+{"state_id": 3, "name": "Assam", "url": "https://en.wikipedia.org/wiki/First_Sarma_ministry", "matched": 40, "total": 93, "elapsed_s": 9.1}
+{"state_id": 4, "name": "Bihar", "url": "https://en.wikipedia.org/wiki/Seventh_Nitish_Kumar_ministry", "matched": 18, "total": 57, "elapsed_s": 7.0}
+{"state_id": 5, "name": "Chhattisgarh", "url": "https://en.wikipedia.org/wiki/Sai_ministry", "matched": 11, "total": 15, "elapsed_s": 2.4}
+{"state_id": 6, "name": "Goa", "url": "https://en.wikipedia.org/wiki/Second_Pramod_Sawant_ministry", "matched": 7, "total": 11, "elapsed_s": 2.4}
+{"state_id": 7, "name": "Gujarat", "url": "https://en.wikipedia.org/wiki/Second_Bhupendrabhai_Patel_ministry", "matched": 4, "total": 58, "elapsed_s": 7.0}
+{"state_id": 8, "name": "Haryana", "url": "https://en.wikipedia.org/wiki/Second_Saini_ministry", "matched": 9, "total": 12, "elapsed_s": 2.2}
+{"state_id": 9, "name": "Himachal Pradesh", "url": "https://en.wikipedia.org/wiki/Sukhu_ministry", "matched": 10, "total": 11, "elapsed_s": 1.7}
+{"state_id": 10, "name": "Jharkhand", "url": "https://en.wikipedia.org/wiki/Third_Hemant_Soren_ministry", "matched": 8, "total": 13, "elapsed_s": 2.1}
+{"state_id": 11, "name": "Karnataka", "url": "https://en.wikipedia.org/wiki/Second_Siddaramaiah_ministry", "matched": 24, "total": 32, "elapsed_s": 7.7}
+{"state_id": 12, "name": "Kerala", "url": "https://en.wikipedia.org/wiki/Second_Vijayan_ministry", "matched": 10, "total": 21, "elapsed_s": 3.3}
+{"state_id": 13, "name": "Madhya Pradesh", "url": "https://en.wikipedia.org/wiki/Mohan_Yadav_ministry", "matched": 17, "total": 22, "elapsed_s": 3.2}
+{"state_id": 14, "name": "Maharashtra", "url": "https://en.wikipedia.org/wiki/Third_Fadnavis_ministry", "matched": 10, "total": 54, "elapsed_s": 7.7}
+{"state_id": 15, "name": "Manipur", "url": "https://en.wikipedia.org/wiki/Second_N._Biren_Singh_ministry", "matched": 9, "total": 12, "elapsed_s": 1.8}
+{"state_id": 16, "name": "Meghalaya", "url": "https://en.wikipedia.org/wiki/Second_Conrad_Sangma_ministry", "matched": 17, "total": 52, "elapsed_s": 6.1}
+{"state_id": 17, "name": "Mizoram", "url": "https://en.wikipedia.org/wiki/Lalduhoma_ministry", "matched": 7, "total": 8, "elapsed_s": 1.6}
+{"state_id": 18, "name": "Nagaland", "url": "https://en.wikipedia.org/wiki/Fifth_Rio_ministry", "matched": 9, "total": 12, "elapsed_s": 3.6}
+{"state_id": 19, "name": "Odisha", "url": "https://en.wikipedia.org/wiki/Mohan_Charan_Majhi_ministry", "matched": 12, "total": 16, "elapsed_s": 3.8}
+{"state_id": 20, "name": "Punjab", "url": "https://en.wikipedia.org/wiki/Mann_ministry", "matched": 11, "total": 16, "elapsed_s": 4.0}
+{"state_id": 21, "name": "Rajasthan", "url": "https://en.wikipedia.org/wiki/Bhajan_Lal_Sharma_ministry", "matched": 9, "total": 15, "elapsed_s": 2.4}
+{"state_id": 22, "name": "Sikkim", "url": "https://en.wikipedia.org/wiki/Second_Tamang_ministry", "matched": 12, "total": 12, "elapsed_s": 2.0}
+{"state_id": 23, "name": "Tamil Nadu", "url": "https://en.wikipedia.org/wiki/M._K._Stalin_ministry", "matched": 31, "total": 35, "elapsed_s": 7.1}
+{"state_id": 24, "name": "Telangana", "url": "https://telangana.gov.in/government/council-of-ministers/", "matched": 16, "total": 16, "elapsed_s": 6.6}
+{"state_id": 25, "name": "Tripura", "url": "https://en.wikipedia.org/wiki/Second_Saha_ministry", "matched": 12, "total": 12, "elapsed_s": 2.5}
+{"state_id": 26, "name": "Uttar Pradesh", "url": "https://en.wikipedia.org/wiki/Second_Yogi_Adityanath_ministry", "matched": 14, "total": 29, "elapsed_s": 5.2}
+{"state_id": 27, "name": "Uttarakhand", "url": "https://en.wikipedia.org/wiki/Second_Dhami_ministry", "matched": 11, "total": 13, "elapsed_s": 2.2}
+{"state_id": 28, "name": "West Bengal", "url": "https://en.wikipedia.org/wiki/Third_Mamata_Banerjee_ministry", "matched": 38, "total": 39, "elapsed_s": 5.8}
+{"state_id": 29, "name": "Delhi", "url": "https://en.wikipedia.org/wiki/Rekha_Gupta_ministry", "matched": 6, "total": 7, "elapsed_s": 1.3}
+{"state_id": 30, "name": "Jammu & Kashmir", "url": "https://en.wikipedia.org/wiki/Second_Omar_Abdullah_ministry", "matched": 5, "total": 6, "elapsed_s": 2.0}

@@ -204,99 +204,305 @@ def tag_winners(base_url: str, state_id: int) -> int:
 
 # ── Ministers ─────────────────────────────────────────────────────────────────
 
+def reset_minister_positions(state_id: int) -> int:
+    """
+    Reset Chief Minister / Cabinet Minister positions back to MLA.
+    Call before re-running tag_ministers to avoid stale tags.
+    Returns count of records updated.
+    """
+    db = get_db()
+    result = (
+        db.table("politicians")
+        .update({"position": "MLA"})
+        .in_("position", ["Chief Minister", "Cabinet Minister"])
+        .eq("state_id", state_id)
+        .execute()
+    )
+    return len(result.data or [])
+
+
 def tag_ministers(ministers_url: str, state_id: int) -> tuple[int, int]:
     """
-    Scrape a state govt council-of-ministers page and tag politicians.
+    Scrape a state govt or Wikipedia council-of-ministers page and tag politicians.
     Returns (matched, total_ministers_found).
-    Looks for a <table> with Name / Portfolio / Constituency columns.
+
+    Accepts tables with either a "Name" column (state govt pages) or
+    a "Minister" column (Wikipedia pages).  Detects the Chief Minister by
+    looking for "chief minister" text in the portfolio column, falling back
+    to the first data row if no explicit text is found.
     """
     try:
-        soup = _get(ministers_url)
+        is_wiki = "wikipedia.org" in ministers_url
+        soup = _get(ministers_url, wiki=is_wiki)
     except Exception as exc:
         raise RuntimeError(f"Ministers page unreachable: {exc}") from exc
 
     db = get_db()
     ministers: list[dict] = []
 
+    # ── Table selection ───────────────────────────────────────────────────────
+    # Scan all qualifying tables. Prefer the one that has an explicit
+    # "Chief Minister" row in the portfolio column (Wikipedia style).
+    # Fall back to the first qualifying table if none has an explicit CM row.
+    _best: tuple | None = None   # (rows, name_idx, port_idx, const_idx, has_explicit_cm)
+
     for table in soup.find_all("table"):
         rows = table.find_all("tr")
         if len(rows) < 3:
             continue
         hdrs = [c.get_text(strip=True).lower() for c in rows[0].find_all(["th", "td"])]
-        if "name" not in " ".join(hdrs):
+        if len(hdrs) < 3:
             continue
-        name_idx  = next((j for j, h in enumerate(hdrs) if "name"         in h), None)
-        port_idx  = next((j for j, h in enumerate(hdrs) if "portfolio"    in h), None)
-        const_idx = next((j for j, h in enumerate(hdrs) if "constituency" in h), None)
+        joined = " ".join(hdrs)
+        if "name" not in joined and "minister" not in joined:
+            continue
+
+        name_idx = next(
+            (j for j, h in enumerate(hdrs)
+             if h.strip() in ("minister", "ministers", "name") or
+             ("name" in h and "portfolio" not in h)),
+            None,
+        )
+        port_idx  = next((j for j, h in enumerate(hdrs) if "portfolio" in h or "department" in h), None)
+        const_idx = next((j for j, h in enumerate(hdrs) if "constituency" in h or "seat" in h), None)
+        if const_idx is not None and const_idx == name_idx:
+            const_idx = None
+
         if name_idx is None:
             continue
-        for i, row in enumerate(rows[1:]):
+
+        # Also detect designation column ("designation" or "status")
+        desig_idx = next((j for j, h in enumerate(hdrs) if h.strip() in ("designation", "status", "position")), None)
+
+        # Check if any row explicitly marks "Chief Minister" via:
+        # (a) portfolio/department column, (b) designation column,
+        # (c) "Chief Minister" section-header row, (d) name cell embedding
+        has_cm = False
+        for row in rows[1:]:
             cells = row.find_all(["td", "th"])
-            if not cells or name_idx >= len(cells):
+            # Section-header row: single cell saying "Chief Minister"
+            if len(cells) == 1:
+                txt = cells[0].get_text(strip=True).lower()
+                if "chief minister" in txt and "deputy" not in txt:
+                    has_cm = True
+                    break
                 continue
-            raw_name     = cells[name_idx].get_text(strip=True)
-            clean_name   = HONORIFICS.sub("", raw_name).strip()
-            constituency = cells[const_idx].get_text(strip=True) if const_idx and const_idx < len(cells) else ""
-            const_clean  = RESERVATION.sub("", constituency).strip()
-            position     = "Chief Minister" if i == 0 else "Cabinet Minister"
-            if clean_name:
-                ministers.append({"name": clean_name, "position": position, "const_clean": const_clean})
-        break
+            # Name cell embedding: "Mamata Banerjee(Chief Minister)"
+            if name_idx < len(cells):
+                nm = cells[name_idx].get_text(strip=True).lower()
+                if "chief minister" in nm and "deputy" not in nm:
+                    has_cm = True
+                    break
+            # Portfolio / department column
+            if port_idx is not None and port_idx < len(cells):
+                pt = cells[port_idx].get_text(strip=True).lower()
+                if "chief minister" in pt and "deputy" not in pt:
+                    has_cm = True
+                    break
+            # Designation column
+            if desig_idx is not None and desig_idx < len(cells):
+                dg = cells[desig_idx].get_text(strip=True).lower()
+                if "chief minister" in dg and "deputy" not in dg:
+                    has_cm = True
+                    break
+
+        if _best is None:
+            _best = (rows, name_idx, port_idx, const_idx, desig_idx, has_cm)
+        elif has_cm and not _best[5]:
+            _best = (rows, name_idx, port_idx, const_idx, desig_idx, has_cm)
+
+        if has_cm:
+            break   # can't do better than an explicit CM table
+
+    if _best is None:
+        return 0, 0
+
+    rows, name_idx, port_idx, const_idx, desig_idx, has_explicit_cm = _best
+
+    # ── Extract ministers ─────────────────────────────────────────────────────
+    next_is_cm = False  # set when a section-header row says "Chief Minister"
+    first_data_row = True
+
+    for row in rows[1:]:
+        cells = row.find_all(["td", "th"])
+        if not cells:
+            continue
+
+        # Section-header row: single cell like "Chief Minister" or "Cabinet Ministers"
+        if len(cells) <= 2 and name_idx >= len(cells):
+            txt = cells[0].get_text(strip=True).lower()
+            if "chief minister" in txt and "deputy" not in txt:
+                next_is_cm = True
+            else:
+                next_is_cm = False
+            continue
+
+        if name_idx >= len(cells):
+            continue
+
+        raw_name   = cells[name_idx].get_text(strip=True)
+        # Check for embedded "Chief Minister" in the name cell before cleaning
+        name_has_cm = "chief minister" in raw_name.lower() and "deputy" not in raw_name.lower()
+        clean_name  = HONORIFICS.sub("", raw_name).strip()
+        # Strip embedded role suffix: "(Chief Minister)", "Chief Minister", "MLA from X"
+        clean_name  = re.sub(r"\s*\(?(Chief\s+Minister|Cabinet\s+Minister|MLA|MP|Member)\)?.*$",
+                             "", clean_name, flags=re.IGNORECASE).strip()
+        clean_name  = re.sub(r",?\s*(from)\b.*$", "", clean_name, flags=re.IGNORECASE).strip()
+        if not clean_name or len(clean_name) < 3:
+            continue
+
+        # Portfolio / department text
+        portfolio_text = ""
+        if port_idx is not None and port_idx < len(cells):
+            portfolio_text = cells[port_idx].get_text(strip=True).lower()
+
+        # Designation text (e.g., Karnataka has a "designation" column)
+        desig_text = ""
+        if desig_idx is not None and desig_idx < len(cells):
+            desig_text = cells[desig_idx].get_text(strip=True).lower()
+
+        if has_explicit_cm:
+            cm_signal = (
+                (name_has_cm) or
+                next_is_cm or
+                ("chief minister" in portfolio_text and "deputy" not in portfolio_text) or
+                ("chief minister" in desig_text and "deputy" not in desig_text)
+            )
+            position = "Chief Minister" if cm_signal else "Cabinet Minister"
+        else:
+            # State-govt-style (e.g. Telangana): first data row = CM
+            position = "Chief Minister" if first_data_row else "Cabinet Minister"
+
+        next_is_cm = False  # consumed
+        first_data_row = False
+
+        constituency = ""
+        if const_idx is not None and const_idx < len(cells):
+            constituency = cells[const_idx].get_text(strip=True)
+        const_clean = RESERVATION.sub("", constituency).strip()
+
+        ministers.append({"name": clean_name, "position": position, "const_clean": const_clean})
+
+    # Deduplicate: if a name appears as both CM and Cabinet Minister (reshuffle tables),
+    # keep CM role — process CMs first so Cabinet Minister entries don't overwrite them.
+    ministers.sort(key=lambda m: 0 if m["position"] == "Chief Minister" else 1)
+    seen_names: set[str] = set()
+    deduped: list[dict] = []
+    for m in ministers:
+        key = re.sub(r"\s+", " ", m["name"].lower().strip())
+        if key not in seen_names:
+            seen_names.add(key)
+            deduped.append(m)
+    ministers = deduped
+
+    def _count(q) -> int:
+        return len((q.execute()).data or [])
+
+    def _update(pos: str, **filters) -> list:
+        q = db.table("politicians").update({"position": pos})
+        for k, v in filters.items():
+            if k.endswith("__ilike"):
+                q = q.ilike(k[:-7], v)
+            elif k.endswith("__in"):
+                q = q.in_(k[:-4], v)
+            else:
+                q = q.eq(k, v)
+        return q.execute().data or []
+
+    def _select(**filters):
+        q = db.table("politicians").select("name,constituency,position")
+        for k, v in filters.items():
+            if k.endswith("__ilike"):
+                q = q.ilike(k[:-7], v)
+            elif k.endswith("__in"):
+                q = q.in_(k[:-4], v)
+            else:
+                q = q.eq(k, v)
+        return q.execute().data or []
 
     matched = 0
     for m in ministers:
         pos, clean, const_clean = m["position"], m["name"], m["const_clean"]
+        tagged = False
 
-        # 1. Exact name
-        res = db.table("politicians").update({"position": pos}).ilike("name", clean).eq("state_id", state_id).execute()
-        if res.data:
+        # ── Tier 1: Exact name (no wildcards, safe) ───────────────────────────
+        res1 = db.table("politicians").update({"position": pos}).ilike("name", clean).eq("state_id", state_id).execute()
+        if res1.data:
             matched += 1
             continue
 
-        # 2. Constituency + MLA (winner in that seat)
+        # ── Tier 1.5: Full name as substring (handles "Dr. Mohan Yadav" for "Mohan Yadav") ──
+        check15 = _select(**{"name__ilike": f"%{clean}%", "state_id": state_id})
+        if len(check15) == 1:
+            db.table("politicians").update({"position": pos}).ilike("name", f"%{clean}%").eq("state_id", state_id).execute()
+            matched += 1
+            continue
+
+        # ── Tier 1.6: Bigram substring (handles "Nayab Singh Saini" → "Nayab Singh") ─
+        parts = clean.split()
+        if len(parts) >= 2:
+            for bi in range(len(parts) - 1):
+                bigram = f"{parts[bi]} {parts[bi+1]}"
+                if any(len(w) > 3 for w in bigram.split()):
+                    check16 = _select(**{"name__ilike": f"%{bigram}%", "state_id": state_id})
+                    if len(check16) == 1:
+                        db.table("politicians").update({"position": pos}).ilike("name", f"%{bigram}%").eq("state_id", state_id).execute()
+                        matched += 1
+                        tagged = True
+                        break
+        if tagged:
+            continue
+
+        # ── Tier 2: Constituency + MLA (winner in that seat) ─────────────────
         if const_clean:
-            res2 = (
-                db.table("politicians")
-                .update({"position": pos})
-                .ilike("constituency", f"%{const_clean}%")
-                .eq("state_id", state_id)
-                .eq("position", "MLA")
-                .execute()
-            )
-            if res2.data:
+            check2 = _select(**{"constituency__ilike": f"%{const_clean}%", "state_id": state_id, "position": "MLA"})
+            if len(check2) == 1:
+                db.table("politicians").update({"position": pos}).ilike("constituency", f"%{const_clean}%").eq("state_id", state_id).eq("position", "MLA").execute()
                 matched += 1
                 continue
 
-        # 3. Constituency + any candidate (catches missed winners)
+        # ── Tier 3: Constituency + any significant name word (SELECT before UPDATE) ──
         if const_clean:
-            parts = clean.split()
-            first = parts[0].lstrip("D.").strip() if parts else ""
-            if first and len(first) > 3:
-                res3 = (
-                    db.table("politicians")
-                    .update({"position": pos})
-                    .ilike("constituency", f"%{const_clean}%")
-                    .eq("state_id", state_id)
-                    .ilike("name", f"%{first}%")
-                    .execute()
-                )
-                if res3.data and len(res3.data) == 1:
-                    matched += 1
-                    continue
+            for word in parts:
+                w = re.sub(r"^[A-Z]\.+", "", word).strip()   # strip initials like "N."
+                if len(w) > 3:
+                    check3 = _select(**{"constituency__ilike": f"%{const_clean}%", "state_id": state_id, "name__ilike": f"%{w}%"})
+                    if len(check3) == 1:
+                        db.table("politicians").update({"position": pos}).ilike("constituency", f"%{const_clean}%").eq("state_id", state_id).ilike("name", f"%{w}%").execute()
+                        matched += 1
+                        tagged = True
+                        break
+        if tagged:
+            continue
 
-        # 4. Unique middle/last word
-        parts = clean.split()
-        probe = parts[-1] if len(parts) >= 2 else ""
-        if probe and len(probe) > 5:
-            res4 = (
-                db.table("politicians")
-                .update({"position": pos})
-                .ilike("name", f"%{probe}%")
-                .eq("state_id", state_id)
-                .execute()
-            )
-            if res4.data and len(res4.data) == 1:
-                matched += 1
+        # ── Tier 4: Unique word (longest first, SELECT before UPDATE) ─────────
+        for probe in sorted(parts, key=len, reverse=True):
+            if len(probe) > 4:
+                check4 = _select(**{"name__ilike": f"%{probe}%", "state_id": state_id})
+                if len(check4) == 1:
+                    db.table("politicians").update({"position": pos}).ilike("name", f"%{probe}%").eq("state_id", state_id).execute()
+                    matched += 1
+                    tagged = True
+                    break
+        if tagged:
+            continue
+
+        # ── Tier 5 (CM only): Best word-overlap candidate ─────────────────────
+        if pos == "Chief Minister":
+            cm_words = {w.lower() for w in parts if len(w) > 4}
+            candidates: dict[str, int] = {}  # db_name → overlap count
+            for word in sorted(cm_words, key=len, reverse=True):
+                found = _select(**{"name__ilike": f"%{word}%", "state_id": state_id})
+                for r in found:
+                    db_words = {w.lower() for w in r["name"].split()}
+                    overlap = len(cm_words & db_words)
+                    if r["name"] not in candidates or candidates[r["name"]] < overlap:
+                        candidates[r["name"]] = overlap
+            if candidates:
+                best_name = max(candidates, key=lambda n: candidates[n])
+                if candidates[best_name] >= 2:
+                    db.table("politicians").update({"position": pos}).ilike("name", best_name).eq("state_id", state_id).execute()
+                    matched += 1
 
     return matched, len(ministers)
 

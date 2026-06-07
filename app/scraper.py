@@ -15,9 +15,15 @@ HEADERS = {
     )
 }
 
+# Wikipedia requires a descriptive, non-browser User-Agent.
+WIKI_HEADERS = {
+    "User-Agent": "NetaLog/1.0 (https://github.com/vinith0140/netalog-backend; vinith0140@gmail.com) python-httpx"
+}
 
-def _get(url: str) -> BeautifulSoup:
-    with httpx.Client(headers=HEADERS, timeout=15, follow_redirects=True) as client:
+
+def _get(url: str, wiki: bool = False) -> BeautifulSoup:
+    hdrs = WIKI_HEADERS if wiki else HEADERS
+    with httpx.Client(headers=hdrs, timeout=20, follow_redirects=True) as client:
         response = client.get(url)
         response.raise_for_status()
     return BeautifulSoup(response.text, "html.parser")
