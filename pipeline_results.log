@@ -1,0 +1,70 @@
+
+======================================================================
+Run started: 2026-06-07T12:04:04.098040
+States: 0 → 29
+======================================================================
+{"state_id": 1, "name": "Andhra Pradesh", "candidates_error": "No constituency links found at https://myneta.info/ap2024/", "elapsed_s": 1.7}
+{"state_id": 2, "name": "Arunachal Pradesh", "myneta_url_used": "https://myneta.info/arunachalpradesh2024/", "candidates_saved": 142, "candidates_skipped": 0, "mla_tagged": 53, "elapsed_s": 122.8}
+{"state_id": 3, "name": "Assam", "myneta_url_used": "https://myneta.info/assam2021/", "candidates_saved": 890, "candidates_skipped": 17, "mla_tagged": 111, "elapsed_s": 270.3}
+
+======================================================================
+Run started: 2026-06-07T12:15:16.203463
+States: 0 → 29
+======================================================================
+{"state_id": 1, "name": "Andhra Pradesh", "candidates_error": "No constituency links found at https://myneta.info/ap2024/", "elapsed_s": 1.7}
+{"state_id": 2, "name": "Arunachal Pradesh", "myneta_url_used": "https://myneta.info/arunachalpradesh2024/", "candidates_saved": 0, "candidates_skipped": 142, "mla_tagged": 53, "elapsed_s": 118.6}
+{"state_id": 4, "name": "Bihar", "myneta_url_used": "https://myneta.info/bihar2020/", "candidates_saved": 2969, "candidates_skipped": 453, "mla_tagged": 214, "elapsed_s": 502.8}
+{"state_id": 3, "name": "Assam", "myneta_url_used": "https://myneta.info/assam2021/", "candidates_saved": 0, "candidates_skipped": 907, "mla_tagged": 111, "elapsed_s": 262.4}
+{"state_id": 5, "name": "Chhattisgarh", "myneta_url_used": "https://myneta.info/chhattisgarh2023/", "candidates_saved": 1076, "candidates_skipped": 16, "mla_tagged": 80, "elapsed_s": 186.1}
+{"state_id": 6, "name": "Goa", "myneta_url_used": "https://myneta.info/goa2022/", "candidates_saved": 293, "candidates_skipped": 1, "mla_tagged": 34, "elapsed_s": 82.5}
+{"state_id": 7, "name": "Gujarat", "myneta_url_used": "https://myneta.info/gujarat2022/", "candidates_saved": 1530, "candidates_skipped": 6, "mla_tagged": 162, "elapsed_s": 370.6}
+{"state_id": 4, "name": "Bihar", "myneta_url_used": "https://myneta.info/bihar2020/", "candidates_saved": 1969, "candidates_skipped": 1453, "mla_tagged": 425, "elapsed_s": 495.1}
+{"state_id": 8, "name": "Haryana", "myneta_url_used": "https://myneta.info/haryana2024/", "candidates_saved": 867, "candidates_skipped": 88, "mla_tagged": 80, "elapsed_s": 180.1}
+{"state_id": 5, "name": "Chhattisgarh", "myneta_url_used": "https://myneta.info/chhattisgarh2023/", "candidates_saved": 76, "candidates_skipped": 1016, "mla_tagged": 156, "elapsed_s": 181.2}
+{"state_id": 6, "name": "Goa", "myneta_url_used": "https://myneta.info/goa2022/", "candidates_saved": 0, "candidates_skipped": 294, "mla_tagged": 34, "elapsed_s": 81.4}
+{"state_id": 9, "name": "Himachal Pradesh", "myneta_url_used": "https://myneta.info/himachalpradesh2022/", "candidates_saved": 367, "candidates_skipped": 40, "mla_tagged": 61, "elapsed_s": 150.0}
+{"state_id": 10, "name": "Jharkhand", "myneta_url_used": "https://myneta.info/jharkhand2024/", "candidates_saved": 1093, "candidates_skipped": 19, "mla_tagged": 72, "elapsed_s": 161.1}
+{"state_id": 7, "name": "Gujarat", "myneta_url_used": "https://myneta.info/gujarat2022/", "candidates_saved": 531, "candidates_skipped": 1005, "mla_tagged": 323, "elapsed_s": 372.5}
+{"state_id": 8, "name": "Haryana", "myneta_url_used": "https://myneta.info/haryana2024/", "candidates_saved": 0, "candidates_skipped": 955, "mla_tagged": 80, "elapsed_s": 174.7}
+{"state_id": 11, "name": "Karnataka", "myneta_url_used": "https://myneta.info/karnataka2023/", "candidates_saved": 2385, "candidates_skipped": 25, "mla_tagged": 199, "elapsed_s": 451.4}
+{"state_id": 9, "name": "Himachal Pradesh", "myneta_url_used": "https://myneta.info/himachalpradesh2022/", "candidates_saved": 0, "candidates_skipped": 407, "mla_tagged": 61, "elapsed_s": 147.3}
+{"state_id": 10, "name": "Jharkhand", "myneta_url_used": "https://myneta.info/jharkhand2024/", "candidates_saved": 93, "candidates_skipped": 1019, "mla_tagged": 73, "elapsed_s": 161.1}
+{"state_id": 12, "name": "Kerala", "myneta_url_used": "https://myneta.info/kerala2021/", "candidates_saved": 897, "candidates_skipped": 7, "mla_tagged": 120, "elapsed_s": 283.6}
+{"state_id": 11, "name": "Karnataka", "myneta_url_used": "https://myneta.info/karnataka2023/", "candidates_saved": 1385, "candidates_skipped": 1025, "mla_tagged": 361, "elapsed_s": 444.0}
+{"state_id": 13, "name": "Madhya Pradesh", "myneta_url_used": "https://myneta.info/madhyapradesh2023/", "candidates_saved": 2326, "candidates_skipped": 42, "mla_tagged": 205, "elapsed_s": 452.3}
+{"state_id": 12, "name": "Kerala", "myneta_url_used": "https://myneta.info/kerala2021/", "candidates_saved": 0, "candidates_skipped": 904, "mla_tagged": 120, "elapsed_s": 276.8}
+{"state_id": 14, "name": "Maharashtra", "myneta_url_used": "https://myneta.info/maharashtra2024/", "candidates_saved": 3805, "candidates_skipped": 30, "mla_tagged": 256, "elapsed_s": 574.9}
+{"state_id": 13, "name": "Madhya Pradesh", "myneta_url_used": "https://myneta.info/madhyapradesh2023/", "candidates_saved": 1326, "candidates_skipped": 1042, "mla_tagged": 384, "elapsed_s": 453.8}
+{"state_id": 15, "name": "Manipur", "myneta_url_used": "https://myneta.info/manipur2022/", "candidates_saved": 265, "candidates_skipped": 0, "mla_tagged": 54, "elapsed_s": 119.2}
+{"state_id": 16, "name": "Meghalaya", "myneta_url_used": "https://myneta.info/meghalaya2023/", "candidates_saved": 366, "candidates_skipped": 1, "mla_tagged": 53, "elapsed_s": 121.6}
+{"state_id": 17, "name": "Mizoram", "myneta_url_used": "https://myneta.info/mizoram2023/", "candidates_saved": 171, "candidates_skipped": 7, "mla_tagged": 35, "elapsed_s": 82.7}
+{"state_id": 18, "name": "Nagaland", "myneta_url_used": "https://myneta.info/nagaland2023/", "candidates_saved": 190, "candidates_skipped": 0, "mla_tagged": 55, "elapsed_s": 123.3}
+{"state_id": 14, "name": "Maharashtra", "myneta_url_used": "https://myneta.info/maharashtra2024/", "candidates_saved": 2805, "candidates_skipped": 1030, "mla_tagged": 512, "elapsed_s": 575.3}
+{"state_id": 19, "name": "Odisha", "myneta_url_used": "https://myneta.info/odisha2024/", "candidates_saved": 1206, "candidates_skipped": 16, "mla_tagged": 131, "elapsed_s": 291.3}
+{"state_id": 15, "name": "Manipur", "myneta_url_used": "https://myneta.info/manipur2022/", "candidates_saved": 0, "candidates_skipped": 265, "mla_tagged": 54, "elapsed_s": 116.0}
+{"state_id": 16, "name": "Meghalaya", "myneta_url_used": "https://myneta.info/meghalaya2023/", "candidates_saved": 0, "candidates_skipped": 367, "mla_tagged": 53, "elapsed_s": 119.9}
+{"state_id": 17, "name": "Mizoram", "myneta_url_used": "https://myneta.info/mizoram2023/", "candidates_saved": 0, "candidates_skipped": 178, "mla_tagged": 35, "elapsed_s": 79.4}
+{"state_id": 20, "name": "Punjab", "myneta_url_used": "https://myneta.info/punjab2022/", "candidates_saved": 983, "candidates_skipped": 214, "mla_tagged": 104, "elapsed_s": 242.6}
+{"state_id": 18, "name": "Nagaland", "myneta_url_used": "https://myneta.info/nagaland2023/", "candidates_saved": 0, "candidates_skipped": 190, "mla_tagged": 55, "elapsed_s": 120.3}
+{"state_id": 19, "name": "Odisha", "myneta_url_used": "https://myneta.info/odisha2024/", "candidates_saved": 206, "candidates_skipped": 1016, "mla_tagged": 247, "elapsed_s": 288.0}
+{"state_id": 21, "name": "Rajasthan", "myneta_url_used": "https://myneta.info/rajasthan2023/", "candidates_saved": 1646, "candidates_skipped": 110, "mla_tagged": 176, "elapsed_s": 406.2}
+{"state_id": 22, "name": "Sikkim", "myneta_url_used": "https://myneta.info/sikkim2024/", "candidates_saved": 141, "candidates_skipped": 4, "mla_tagged": 28, "elapsed_s": 69.1}
+{"state_id": 20, "name": "Punjab", "myneta_url_used": "https://myneta.info/punjab2022/", "candidates_saved": 0, "candidates_skipped": 1197, "mla_tagged": 104, "elapsed_s": 244.1}
+{"state_id": 23, "name": "Tamil Nadu", "myneta_url_used": "https://myneta.info/tamilnadu2021/", "candidates_saved": 3469, "candidates_skipped": 81, "mla_tagged": 200, "elapsed_s": 467.6}
+{"state_id": 21, "name": "Rajasthan", "myneta_url_used": "https://myneta.info/rajasthan2023/", "candidates_saved": 646, "candidates_skipped": 1110, "mla_tagged": 321, "elapsed_s": 404.8}
+{"state_id": 22, "name": "Sikkim", "myneta_url_used": "https://myneta.info/sikkim2024/", "candidates_saved": 0, "candidates_skipped": 145, "mla_tagged": 28, "elapsed_s": 66.9}
+{"state_id": 24, "name": "Telangana", "myneta_url_used": "https://myneta.info/telangana2023/", "candidates_saved": 1032, "candidates_skipped": 1028, "mla_tagged": 207, "ministers_matched": 14, "ministers_total": 16, "elapsed_s": 248.0}
+{"state_id": 25, "name": "Tripura", "myneta_url_used": "https://myneta.info/tripura2023/", "candidates_saved": 257, "candidates_skipped": 8, "mla_tagged": 55, "elapsed_s": 126.7}
+{"state_id": 26, "name": "Uttar Pradesh", "candidates_error": "No constituency links found at https://myneta.info/up2022/", "elapsed_s": 1.5}
+{"state_id": 27, "name": "Uttarakhand", "myneta_url_used": "https://myneta.info/uttarakhand2022/", "candidates_saved": 578, "candidates_skipped": 13, "mla_tagged": 63, "elapsed_s": 146.8}
+{"state_id": 23, "name": "Tamil Nadu", "myneta_url_used": "https://myneta.info/tamilnadu2021/", "candidates_saved": 2469, "candidates_skipped": 1081, "mla_tagged": 399, "elapsed_s": 464.8}
+{"state_id": 24, "name": "Telangana", "myneta_url_used": "https://myneta.info/telangana2023/", "candidates_saved": 1032, "candidates_skipped": 1028, "mla_tagged": 313, "ministers_matched": 13, "ministers_total": 16, "elapsed_s": 247.8}
+{"state_id": 25, "name": "Tripura", "myneta_url_used": "https://myneta.info/tripura2023/", "candidates_saved": 0, "candidates_skipped": 265, "mla_tagged": 55, "elapsed_s": 124.4}
+{"state_id": 26, "name": "Uttar Pradesh", "candidates_error": "No constituency links found at https://myneta.info/up2022/", "elapsed_s": 1.5}
+{"state_id": 28, "name": "West Bengal", "myneta_url_used": "https://myneta.info/westbengal2021/", "candidates_saved": 2001, "candidates_skipped": 60, "mla_tagged": 262, "elapsed_s": 600.9}
+{"state_id": 27, "name": "Uttarakhand", "myneta_url_used": "https://myneta.info/uttarakhand2022/", "candidates_saved": 0, "candidates_skipped": 591, "mla_tagged": 63, "elapsed_s": 143.3}
+{"state_id": 29, "name": "Delhi", "myneta_url_used": "https://myneta.info/delhi2025/", "candidates_saved": 627, "candidates_skipped": 30, "mla_tagged": 63, "elapsed_s": 139.2}
+{"state_id": 30, "name": "Jammu & Kashmir", "myneta_url_used": "https://myneta.info/jammukashmir2024/", "candidates_saved": 780, "candidates_skipped": 41, "mla_tagged": 79, "elapsed_s": 180.5}
+{"state_id": 28, "name": "West Bengal", "myneta_url_used": "https://myneta.info/westbengal2021/", "candidates_saved": 1001, "candidates_skipped": 1060, "mla_tagged": 488, "elapsed_s": 601.1}
+{"state_id": 29, "name": "Delhi", "myneta_url_used": "https://myneta.info/delhi2025/", "candidates_saved": 0, "candidates_skipped": 657, "mla_tagged": 63, "elapsed_s": 136.5}
+{"state_id": 30, "name": "Jammu & Kashmir", "myneta_url_used": "https://myneta.info/jammukashmir2024/", "candidates_saved": 0, "candidates_skipped": 821, "mla_tagged": 79, "elapsed_s": 177.1}
