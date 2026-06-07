@@ -64,6 +64,7 @@ def get_state(state_id: int):
 def get_politicians(
     state_id: int | None = Query(None, description="Filter by state"),
     party: str | None = Query(None, description="Filter by party name"),
+    position: str | None = Query(None, description="Filter by position (exact match)"),
     search: str | None = Query(None, description="Search by name"),
     limit: int = Query(50, le=200),
     offset: int = Query(0),
@@ -75,6 +76,8 @@ def get_politicians(
         query = query.eq("state_id", state_id)
     if party:
         query = query.ilike("party", f"%{party}%")
+    if position:
+        query = query.eq("position", position)
     if search:
         query = query.ilike("name", f"%{search}%")
 
