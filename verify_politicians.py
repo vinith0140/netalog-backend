@@ -117,6 +117,46 @@ def names_match(reference: str, candidate: str) -> bool:
     return sum(1 for w in words if w in c) >= max(1, (len(words) + 1) // 2)
 
 
+def _leading_words(answer: str, n: int = 3) -> list[str]:
+    """First N capitalised words from an answer (the person's name at the start)."""
+    words = []
+    for w in answer.split():
+        clean = w.strip(".,;:()")
+        if clean and clean[0].isupper():
+            words.append(clean.lower())
+            if len(words) == n:
+                break
+        elif words:
+            break
+    return words
+
+
+def leading_names_agree(ans1: str, ans2: str) -> bool:
+    """Both answers open with the same person's name (prefix/exact match on key words)."""
+    w1s = _leading_words(ans1)
+    w2s = _leading_words(ans2)
+    if not w1s or not w2s:
+        return False
+    for a in w1s:
+        for b in w2s:
+            if len(a) > 3 and len(b) > 3 and (a == b or a.startswith(b) or b.startswith(a)):
+                return True
+    return False
+
+
+def is_name_variant(tavily_name: str, db_name: str) -> bool:
+    """True when tavily_name and db_name refer to the same person (format differs).
+    Detected by a significant word (>3 chars) that is equal or one is a prefix of the other.
+    """
+    tw = [w.lower().strip(".,()") for w in tavily_name.split() if len(w.strip(".,()")) > 3]
+    dw = [w.lower().strip(".,()") for w in db_name.split()     if len(w.strip(".,()")) > 3]
+    for a in tw:
+        for b in dw:
+            if a == b or a.startswith(b) or b.startswith(a):
+                return True
+    return False
+
+
 # ── DB helpers ────────────────────────────────────────────────────────────────
 
 def search_politician(db, state_id: int, name: str):
@@ -238,20 +278,36 @@ def main():
                 except Exception:
                     pass
 
-        elif not q1_match and not q2_match and names_match(extract_name(q1), q2):
-            # Both disagree with DB and agree with each other → auto-fix
+        elif not q1_match and not q2_match and (
+            leading_names_agree(q1, q2) or names_match(extract_name(q1), q2)
+        ):
+            # Both queries disagree with DB but agree with each other
             agreed_name = extract_name(q1)
-            new_id = auto_fix(db, state_id, state_name, cm_record, agreed_name)
-            if new_id:
+            if not agreed_name or len(agreed_name) < 3:
+                agreed_name = " ".join(_leading_words(q1))
+
+            if cm_record and is_name_variant(agreed_name, scraped):
+                # Same person — Tavily uses a shorter/different format → rename DB record
                 try:
-                    copy_to_verified(db, new_id)
+                    db.table("politicians").update({"name": agreed_name}).eq("id", cm_record["id"]).execute()
+                    copy_to_verified(db, cm_record["id"])
                 except Exception:
                     pass
-                result = "FIXED [~]"
-                fixed += 1
+                result = "VERIFIED [OK]"
+                verified += 1
             else:
-                result = "NEEDS MANUAL REVIEW"
-                needs_review += 1
+                # Different person → demote old CM, promote/insert new one
+                new_id = auto_fix(db, state_id, state_name, cm_record, agreed_name)
+                if new_id:
+                    try:
+                        copy_to_verified(db, new_id)
+                    except Exception:
+                        pass
+                    result = "FIXED [~]"
+                    fixed += 1
+                else:
+                    result = "NEEDS MANUAL REVIEW"
+                    needs_review += 1
 
         else:
             result = "NEEDS MANUAL REVIEW"
