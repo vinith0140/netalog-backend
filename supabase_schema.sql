@@ -37,11 +37,33 @@ create table if not exists achievements (
   created_at      timestamptz default now()
 );
 
+create table if not exists verified_politicians (
+  id              integer primary key,
+  name            text not null,
+  party           text not null,
+  state_id        integer references states(id),
+  constituency    text,
+  position        text,
+  education       text,
+  assets          numeric,
+  liabilities     numeric,
+  criminal_cases  integer default 0,
+  age             integer,
+  gender          text,
+  image_url       text,
+  myneta_url      text,
+  created_at      timestamptz,
+  verified_at     timestamptz default now()
+);
+
 -- Indexes for common filters
 create index if not exists idx_politicians_state    on politicians(state_id);
 create index if not exists idx_politicians_party    on politicians(party);
 create index if not exists idx_achievements_pol     on achievements(politician_id);
 create index if not exists idx_achievements_date    on achievements(published_date desc);
+create index if not exists idx_vp_state             on verified_politicians(state_id);
+create index if not exists idx_vp_party             on verified_politicians(party);
+create index if not exists idx_vp_position          on verified_politicians(position);
 
 -- Sample seed data
 insert into states (name, code, region) values

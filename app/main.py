@@ -70,7 +70,7 @@ def get_politicians(
     offset: int = Query(0),
 ):
     db = get_db()
-    query = db.table("politicians").select("*")
+    query = db.table("verified_politicians").select("*")
 
     if state_id is not None:
         query = query.eq("state_id", state_id)
@@ -92,7 +92,7 @@ def get_politicians(
 def get_politician(politician_id: int):
     db = get_db()
     try:
-        pol_result = db.table("politicians").select("*").eq("id", politician_id).single().execute()
+        pol_result = db.table("verified_politicians").select("*").eq("id", politician_id).single().execute()
     except APIError as exc:
         raise _db_error(exc)
 
