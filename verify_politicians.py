@@ -1,14 +1,16 @@
 """
 verify_politicians.py
-Verifies all 30 state Chief Ministers using two independent Tavily searches per state.
+Verifies all 30 state Chief Ministers using 3 independent API sources.
 
-  Query 1: "Chief Minister of {state} India 2026"
-  Query 2: "{state} Chief Minister name June 2026"
+  Sources:
+    1. Tavily search
+    2. Perplexity sonar-pro
+    3. Gemini 2.5 Flash with Google Search grounding
 
-Consensus:
-  Both queries match DB              → VERIFIED [OK]   — copy to verified_politicians
-  Both queries agree, differ from DB → FIXED    [~]    — auto-fix DB + copy to verified_politicians
-  Queries disagree                   → NEEDS MANUAL REVIEW — flag only, no change
+Consensus (2/3 majority):
+  2+ match DB              -> VERIFIED [OK]  — copy to verified_politicians
+  2+ agree, differ from DB -> FIXED    [~]   — auto-fix DB + copy
+  No 2/3 consensus         -> NEEDS MANUAL REVIEW
 """
 
 import os
@@ -21,12 +23,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-TAVILY_KEY = os.environ.get("TAVILY_API_KEY", "")
-
-QUERIES = [
-    "Chief Minister of {state} India 2026",
-    "{state} Chief Minister name June 2026",
-]
+TAVILY_KEY  = os.environ.get("TAVILY_API_KEY", "")
+PPLX_KEY    = os.environ.get("PERPLEXITY_API_KEY", "")
+GEMINI_KEY  = os.environ.get("GEMINI_API_KEY", "")
 
 KNOWN_PARTIES = [
     "Tamilaga Vettri Kazhagam", "TVK", "BJP", "INC", "Congress", "AAP",
@@ -37,33 +36,79 @@ KNOWN_PARTIES = [
 ]
 
 
-# ── Tavily ────────────────────────────────────────────────────────────────────
+# ── API callers ───────────────────────────────────────────────────────────────
 
-def tavily_search(query: str) -> str:
+def tavily_search(state: str) -> str:
     if not TAVILY_KEY:
         return "NO KEY"
-    with httpx.Client(timeout=30) as client:
-        resp = client.post(
-            "https://api.tavily.com/search",
-            json={
-                "api_key": TAVILY_KEY,
-                "query": query,
-                "max_results": 5,
-                "include_answer": True,
-            },
+    try:
+        r = httpx.post("https://api.tavily.com/search", json={
+            "api_key": TAVILY_KEY,
+            "query": f"Who is the current Chief Minister of {state} India 2026",
+            "max_results": 3,
+            "include_answer": True,
+        }, timeout=30)
+        r.raise_for_status()
+        d = r.json()
+        return (d.get("answer") or "").strip()[:300] or "no answer"
+    except Exception as e:
+        msg = str(e)
+        return "QUOTA" if ("429" in msg or "rate" in msg.lower()) else f"ERR:{msg[:40]}"
+
+
+def perplexity_search(state: str) -> str:
+    if not PPLX_KEY:
+        return "NO KEY"
+    try:
+        r = httpx.post("https://api.perplexity.ai/chat/completions", json={
+            "model": "sonar-pro",
+            "messages": [
+                {"role": "system", "content": "Answer in one sentence with the person's full name only."},
+                {"role": "user",   "content": f"Who is the current Chief Minister of {state}, India as of 2026?"},
+            ],
+            "max_tokens": 120,
+        }, headers={"Authorization": f"Bearer {PPLX_KEY}"}, timeout=30)
+        r.raise_for_status()
+        return r.json()["choices"][0]["message"]["content"].strip()[:300]
+    except Exception as e:
+        msg = str(e)
+        return "QUOTA" if ("429" in msg or "rate" in msg.lower()) else f"ERR:{msg[:40]}"
+
+
+def gemini_search(state: str) -> str:
+    if not GEMINI_KEY:
+        return "NO KEY"
+    try:
+        url = (
+            "https://generativelanguage.googleapis.com/v1beta/models/"
+            f"gemini-2.5-flash:generateContent?key={GEMINI_KEY}"
         )
-        resp.raise_for_status()
-        data = resp.json()
-        answer = data.get("answer", "")
-        if answer:
-            return answer.strip()
-        results = data.get("results", [])
-        return results[0].get("content", "")[:200] if results else ""
+        r = httpx.post(url, json={
+            "contents": [{"parts": [{"text": (
+                f"Who is the current Chief Minister of {state}, India as of 2026? "
+                "Answer in one sentence with the person's full name."
+            )}]}],
+            "tools": [{"google_search": {}}],
+            "generationConfig": {"maxOutputTokens": 150},
+        }, timeout=30)
+        r.raise_for_status()
+        parts = r.json()["candidates"][0]["content"]["parts"]
+        return " ".join(p.get("text", "") for p in parts).strip()[:300]
+    except Exception as e:
+        msg = str(e)
+        return "QUOTA" if ("429" in msg or "rate" in msg.lower()) else f"ERR:{msg[:40]}"
 
 
 def get_party_tavily(name: str, state: str) -> str:
     try:
-        answer = tavily_search(f"{name} political party {state} India 2026")
+        r = httpx.post("https://api.tavily.com/search", json={
+            "api_key": TAVILY_KEY,
+            "query": f"{name} political party {state} India 2026",
+            "max_results": 3,
+            "include_answer": True,
+        }, timeout=30)
+        r.raise_for_status()
+        answer = (r.json().get("answer") or "").strip()
         for party in KNOWN_PARTIES:
             if party.lower() in answer.lower():
                 return party
@@ -74,39 +119,40 @@ def get_party_tavily(name: str, state: str) -> str:
 
 # ── Name helpers ──────────────────────────────────────────────────────────────
 
-def extract_name(tavily_answer: str) -> str:
-    """Pull a person's name out of a Tavily answer sentence."""
+def extract_name(answer: str) -> str:
+    """Pull a person's name from an API answer sentence."""
     # "X is/was/became/has been the Chief Minister..."
     m = re.match(
-        r'^([A-Z][A-Za-z.\s\-]{2,40}?)\s+(?:is|was|has been|became|assumed)\s+(?:the\s+)?(?:current\s+)?(?:Chief\s+Minister|CM)\b',
-        tavily_answer,
+        r'^([A-Z][A-Za-z.\s\-]{2,40}?)\s+(?:is|was|has been|became|assumed)\s+'
+        r'(?:the\s+)?(?:current\s+)?(?:Chief\s+Minister|CM)\b',
+        answer,
     )
     if m:
         return m.group(1).strip()
     # "...Chief Minister of X is Y..."
     m2 = re.search(
-        r'(?:Chief\s+Minister|CM)\s+(?:of\s+[\w\s&]{2,25}\s+)?is\s+([A-Z][A-Za-z.\s\-]{2,40}?)(?:\s*[,.])',
-        tavily_answer,
+        r'(?:Chief\s+Minister|CM)\s+(?:of\s+[\w\s&]{2,25}\s+)?is\s+'
+        r'([A-Z][A-Za-z.\s\-]{2,40}?)(?:\s*[,.])',
+        answer,
     )
     if m2:
         return m2.group(1).strip()
-    # Fallback: leading capitalised words (likely a name)
-    words = tavily_answer.split()
+    # Fallback: leading capitalised words
+    words = answer.split()
     name_words = []
     for w in words[:6]:
-        clean = w.strip(".,;:()")
+        clean = w.strip(".,;:()**")
         if clean and clean[0].isupper():
             name_words.append(clean)
         else:
             break
-    return " ".join(name_words) if name_words else tavily_answer[:40]
+    return " ".join(name_words) if name_words else answer[:40]
 
 
 def names_match(reference: str, candidate: str) -> bool:
-    """True if reference name is recognisably present in candidate string."""
     if not reference or not candidate:
         return False
-    if candidate.startswith(("NO KEY", "ERR", "QUOTA", "NO CREDITS")):
+    if any(candidate.startswith(p) for p in ("NO KEY", "ERR", "QUOTA", "no answer")):
         return False
     r, c = reference.lower(), candidate.lower()
     if r in c or c in r:
@@ -117,44 +163,23 @@ def names_match(reference: str, candidate: str) -> bool:
     return sum(1 for w in words if w in c) >= max(1, (len(words) + 1) // 2)
 
 
-def _leading_words(answer: str, n: int = 3) -> list[str]:
-    """First N capitalised words from an answer (the person's name at the start)."""
-    words = []
-    for w in answer.split():
-        clean = w.strip(".,;:()")
-        if clean and clean[0].isupper():
-            words.append(clean.lower())
-            if len(words) == n:
-                break
-        elif words:
-            break
-    return words
-
-
-def leading_names_agree(ans1: str, ans2: str) -> bool:
-    """Both answers open with the same person's name (prefix/exact match on key words)."""
-    w1s = _leading_words(ans1)
-    w2s = _leading_words(ans2)
-    if not w1s or not w2s:
-        return False
-    for a in w1s:
-        for b in w2s:
-            if len(a) > 3 and len(b) > 3 and (a == b or a.startswith(b) or b.startswith(a)):
-                return True
-    return False
-
-
-def is_name_variant(tavily_name: str, db_name: str) -> bool:
-    """True when tavily_name and db_name refer to the same person (format differs).
-    Detected by a significant word (>3 chars) that is equal or one is a prefix of the other.
-    """
-    tw = [w.lower().strip(".,()") for w in tavily_name.split() if len(w.strip(".,()")) > 3]
-    dw = [w.lower().strip(".,()") for w in db_name.split()     if len(w.strip(".,()")) > 3]
+def is_name_variant(api_name: str, db_name: str) -> bool:
+    tw = [w.lower().strip(".,()") for w in api_name.split() if len(w.strip(".,()")) > 3]
+    dw = [w.lower().strip(".,()") for w in db_name.split()  if len(w.strip(".,()")) > 3]
     for a in tw:
         for b in dw:
             if a == b or a.startswith(b) or b.startswith(a):
                 return True
     return False
+
+
+def majority_agreed_name(answers: list) -> str | None:
+    """Return a name agreed upon by 2+ of the given answers, or None."""
+    names = [extract_name(a) for a in answers]
+    for i, j in [(0, 1), (0, 2), (1, 2)]:
+        if names[i] and names[j] and names_match(names[i], names[j]):
+            return names[i] if len(names[i]) >= len(names[j]) else names[j]
+    return None
 
 
 # ── DB helpers ────────────────────────────────────────────────────────────────
@@ -186,7 +211,7 @@ def copy_to_verified(db, politician_id: int) -> None:
     db.table("verified_politicians").upsert(row, on_conflict="id").execute()
 
 
-def auto_fix(db, state_id: int, state_name: str, old_cm: dict | None, agreed_name: str) -> int | None:
+def auto_fix(db, state_id: int, state_name: str, old_cm, agreed_name: str):
     if old_cm:
         db.table("politicians").update({"position": "MLA"}).eq("id", old_cm["id"]).execute()
 
@@ -195,11 +220,9 @@ def auto_fix(db, state_id: int, state_name: str, old_cm: dict | None, agreed_nam
         db.table("politicians").update({"position": "Chief Minister"}).eq("id", found["id"]).execute()
         return found["id"]
 
-    # Not in DB — fetch party then insert
     time.sleep(2)
     party = get_party_tavily(agreed_name, state_name)
     time.sleep(2)
-
     result = db.table("politicians").insert({
         "name":     agreed_name,
         "party":    party,
@@ -220,18 +243,14 @@ def main():
         sys.exit("ERROR: No states found in Supabase")
     states_sorted = sorted(states_raw, key=lambda s: s["name"])
 
-    print(f"CM Verification  |  {len(states_sorted)} states  |  Tavily x2\n")
-
-    cw = [24, 30, 34, 34, 22]
-    print(
-        f"{'State':<{cw[0]}} {'Scraped CM':<{cw[1]}} "
-        f"{'Tavily Q1':<{cw[2]}} {'Tavily Q2':<{cw[3]}} Result"
-    )
-    print("-" * (sum(cw) + 4))
+    print("CM Verification  |  30 states  |  Tavily + Perplexity sonar-pro + Gemini 2.5 Flash  |  2/3 majority\n")
+    print(f"{'State':<22} {'DB name':<28} Votes   Result")
+    print("-" * 90)
 
     verified = fixed = needs_review = 0
 
-    def tr(s: str, n: int) -> str:
+    def tr(s: str, n: int = 28) -> str:
+        s = s.replace("\n", " ").replace("**", "").strip()
         return s[:n-1] + "~" if len(s) >= n else s
 
     for state in states_sorted:
@@ -253,23 +272,18 @@ def main():
         except Exception:
             scraped = "(db err)"
 
-        # Two independent Tavily searches
-        q_answers = []
-        for q_template in QUERIES:
-            try:
-                ans = tavily_search(q_template.format(state=state_name))
-            except Exception as exc:
-                msg = str(exc)
-                ans = "QUOTA" if ("429" in msg or "rate" in msg.lower()) else "ERR"
-            q_answers.append(ans)
-            time.sleep(2)
+        tv = tavily_search(state_name);     time.sleep(1)
+        pp = perplexity_search(state_name); time.sleep(1)
+        gm = gemini_search(state_name);     time.sleep(1)
 
-        q1, q2 = q_answers
-        q1_match = names_match(scraped, q1)
-        q2_match = names_match(scraped, q2)
+        tv_match = names_match(scraped, tv)
+        pp_match = names_match(scraped, pp)
+        gm_match = names_match(scraped, gm)
+        match_count = sum([tv_match, pp_match, gm_match])
 
-        if q1_match and q2_match:
-            # Both confirm what's in DB
+        votes = f"T={'Y' if tv_match else 'N'} P={'Y' if pp_match else 'N'} G={'Y' if gm_match else 'N'}"
+
+        if match_count >= 2:
             result = "VERIFIED [OK]"
             verified += 1
             if cm_record:
@@ -278,51 +292,40 @@ def main():
                 except Exception:
                     pass
 
-        elif not q1_match and not q2_match and (
-            leading_names_agree(q1, q2) or names_match(extract_name(q1), q2)
-        ):
-            # Both queries disagree with DB but agree with each other
-            agreed_name = extract_name(q1)
-            if not agreed_name or len(agreed_name) < 3:
-                agreed_name = " ".join(_leading_words(q1))
+        else:
+            # Check if 2+ non-matching answers agree on a different name
+            non_matching = [a for a, m in zip([tv, pp, gm], [tv_match, pp_match, gm_match]) if not m]
+            agreed_name = majority_agreed_name(non_matching)
 
-            if cm_record and is_name_variant(agreed_name, scraped):
-                # Same person — Tavily uses a shorter/different format → rename DB record
-                try:
-                    db.table("politicians").update({"name": agreed_name}).eq("id", cm_record["id"]).execute()
-                    copy_to_verified(db, cm_record["id"])
-                except Exception:
-                    pass
-                result = "VERIFIED [OK]"
-                verified += 1
-            else:
-                # Different person → demote old CM, promote/insert new one
-                new_id = auto_fix(db, state_id, state_name, cm_record, agreed_name)
-                if new_id:
+            if agreed_name and len(agreed_name) >= 3:
+                if cm_record and is_name_variant(agreed_name, scraped):
                     try:
-                        copy_to_verified(db, new_id)
+                        db.table("politicians").update({"name": agreed_name}).eq("id", cm_record["id"]).execute()
+                        copy_to_verified(db, cm_record["id"])
                     except Exception:
                         pass
-                    result = "FIXED [~]"
-                    fixed += 1
+                    result = "VERIFIED [OK]"
+                    verified += 1
                 else:
-                    result = "NEEDS MANUAL REVIEW"
-                    needs_review += 1
+                    new_id = auto_fix(db, state_id, state_name, cm_record, agreed_name)
+                    if new_id:
+                        try:
+                            copy_to_verified(db, new_id)
+                        except Exception:
+                            pass
+                        result = f"FIXED [~] -> {tr(agreed_name, 30)}"
+                        fixed += 1
+                    else:
+                        result = "NEEDS MANUAL REVIEW"
+                        needs_review += 1
+            else:
+                result = "NEEDS MANUAL REVIEW"
+                needs_review += 1
 
-        else:
-            result = "NEEDS MANUAL REVIEW"
-            needs_review += 1
-
-        print(
-            f"{state_name:<{cw[0]}} "
-            f"{tr(scraped, cw[1]):<{cw[1]}} "
-            f"{tr(q1,      cw[2]):<{cw[2]}} "
-            f"{tr(q2,      cw[3]):<{cw[3]}} "
-            f"{result}"
-        )
+        print(f"{state_name:<22} {tr(scraped):<28} {votes}  {result}")
 
     print()
-    print("=" * 60)
+    print("=" * 70)
     print(f"VERIFIED           : {verified}/30")
     print(f"FIXED              : {fixed}/30")
     print(f"NEEDS MANUAL REVIEW: {needs_review}/30")
