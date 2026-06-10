@@ -1,0 +1,35 @@
+name: NetaLog Pipeline
+
+on:
+  schedule:
+    - cron: "30 20 * * 0"   # Every Sunday 20:30 UTC = Monday 2:00 AM IST
+  workflow_dispatch:          # Manual trigger from GitHub Actions UI
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    env:
+      SUPABASE_URL:        ${{ secrets.SUPABASE_URL }}
+      SUPABASE_KEY:        ${{ secrets.SUPABASE_KEY }}
+      TAVILY_API_KEY:      ${{ secrets.TAVILY_API_KEY }}
+      PERPLEXITY_API_KEY:  ${{ secrets.PERPLEXITY_API_KEY }}
+      GEMINI_API_KEY:      ${{ secrets.GEMINI_API_KEY }}
+      DEEPSEEK_API_KEY:    ${{ secrets.DEEPSEEK_API_KEY }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run NetaLog pipeline
+        run: python pipeline.py

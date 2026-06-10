@@ -2,11 +2,29 @@
 -- Run this in your Supabase project: Dashboard → SQL Editor → New Query
 
 create table if not exists states (
-  id      serial primary key,
-  name    text not null,
-  code    text not null unique,
-  region  text
+  id              serial primary key,
+  name            text not null,
+  code            text not null unique,
+  region          text,
+  capital         text,
+  population      bigint,
+  last_election   integer,
+  next_election   integer,
+  ruling_party    text,
+  party_seats     integer,
+  total_seats     integer,
+  in_power_since  integer
 );
+
+-- Add new columns to existing states table (safe to run on existing DB):
+alter table states add column if not exists capital        text;
+alter table states add column if not exists population     bigint;
+alter table states add column if not exists last_election  integer;
+alter table states add column if not exists next_election  integer;
+alter table states add column if not exists ruling_party   text;
+alter table states add column if not exists party_seats    integer;
+alter table states add column if not exists total_seats    integer;
+alter table states add column if not exists in_power_since integer;
 
 create table if not exists politicians (
   id              serial primary key,

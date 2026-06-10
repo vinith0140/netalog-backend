@@ -176,7 +176,8 @@ def is_name_variant(api_name: str, db_name: str) -> bool:
 def majority_agreed_name(answers: list) -> str | None:
     """Return a name agreed upon by 2+ of the given answers, or None."""
     names = [extract_name(a) for a in answers]
-    for i, j in [(0, 1), (0, 2), (1, 2)]:
+    pairs = [(i, j) for i in range(len(names)) for j in range(i + 1, len(names))]
+    for i, j in pairs:
         if names[i] and names[j] and names_match(names[i], names[j]):
             return names[i] if len(names[i]) >= len(names[j]) else names[j]
     return None
