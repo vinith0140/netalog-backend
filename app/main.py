@@ -129,12 +129,12 @@ def get_state(state_id: int):
     """Single state with full metadata."""
     db = get_db()
     try:
-        result = db.table("states").select("*").eq("id", state_id).single().execute()
+        result = db.table("states").select("*").eq("id", state_id).limit(1).execute()
     except APIError as exc:
         raise _db_error(exc)
     if not result.data:
         raise HTTPException(status_code=404, detail="State not found")
-    return result.data
+    return result.data[0]
 
 
 @app.get("/states/{state_id}/summary", response_model=StateSummary, tags=["States"])
@@ -142,11 +142,12 @@ def get_state_summary(state_id: int):
     """Dashboard stats for one state: CM, counts, criminal case %, avg assets, party breakdown."""
     db = get_db()
     try:
-        state_res = db.table("states").select("*").eq("id", state_id).single().execute()
+        state_res = db.table("states").select("*").eq("id", state_id).limit(1).execute()
     except APIError as exc:
         raise _db_error(exc)
     if not state_res.data:
         raise HTTPException(status_code=404, detail="State not found")
+    state_res.data = state_res.data[0]
 
     try:
         pols = db.table("verified_politicians").select(
@@ -236,15 +237,15 @@ def get_politician(politician_id: int):
     """Full politician profile — includes state info and achievements."""
     db = get_db()
     try:
-        pol_res = db.table("verified_politicians").select("*").eq("id", politician_id).single().execute()
+        pol_res = db.table("verified_politicians").select("*").eq("id", politician_id).limit(1).execute()
     except APIError as exc:
         raise _db_error(exc)
     if not pol_res.data:
         raise HTTPException(status_code=404, detail="Politician not found")
 
-    p = pol_res.data
+    p = pol_res.data[0]
     try:
-        state_res = db.table("states").select("*").eq("id", p["state_id"]).single().execute()
+        state_res = db.table("states").select("*").eq("id", p["state_id"]).limit(1).execute()
         ach_res   = (
             db.table("achievements").select("*")
             .eq("politician_id", politician_id)
@@ -254,7 +255,7 @@ def get_politician(politician_id: int):
     except APIError as exc:
         raise _db_error(exc)
 
-    return {**p, "state": state_res.data, "achievements": ach_res.data or []}
+    return {**p, "state": state_res.data[0] if state_res.data else None, "achievements": ach_res.data or []}
 
 
 # ---------------------------------------------------------------------------
