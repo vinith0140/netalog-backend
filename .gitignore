@@ -4,6 +4,9 @@ __pycache__/
 *.pyc
 *.pyo
 .DS_Store
+.claude/
+
+# logs
+*.log
 uvicorn_out.txt
 uvicorn_err.txt
-.claude/
