@@ -3,8 +3,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from postgrest.exceptions import APIError
 
 from app.database import get_db
-from app.models import Politician, PoliticianDetail, State, Achievement
+from app.models import Politician, PoliticianDetail, State, Achievement, StateSummary
 from app.scraper import scrape_pib_releases, scrape_myneta_politician
+from app.state_config import FEATURED_STATE_IDS
 
 
 def _db_error(exc: APIError) -> HTTPException:
@@ -42,6 +43,68 @@ def get_states():
     except APIError as exc:
         raise _db_error(exc)
     return result.data
+
+
+@app.get("/states/featured", response_model=list[State], tags=["States"])
+def get_featured_states():
+    """Return the 8 featured states with full metadata."""
+    db = get_db()
+    try:
+        result = db.table("states").select("*").in_("id", FEATURED_STATE_IDS).order("name").execute()
+    except APIError as exc:
+        raise _db_error(exc)
+    return result.data
+
+
+@app.get("/states/{state_id}/summary", response_model=StateSummary, tags=["States"])
+def get_state_summary(state_id: int):
+    """Per-state dashboard stats: CM, verified counts, criminal case %, avg assets."""
+    db = get_db()
+    try:
+        state_res = db.table("states").select("*").eq("id", state_id).single().execute()
+    except APIError as exc:
+        raise _db_error(exc)
+    if not state_res.data:
+        raise HTTPException(status_code=404, detail="State not found")
+    s = state_res.data
+
+    try:
+        pols = db.table("verified_politicians").select(
+            "id,name,party,position,constituency,assets,criminal_cases"
+        ).eq("state_id", state_id).execute().data or []
+    except APIError as exc:
+        raise _db_error(exc)
+
+    cm = next((p for p in pols if p["position"] == "Chief Minister"), None)
+    mla_count     = sum(1 for p in pols if p["position"] == "MLA")
+    cabinet_count = sum(1 for p in pols if p["position"] == "Cabinet Minister")
+    with_crimes   = sum(1 for p in pols if p.get("criminal_cases") and int(p["criminal_cases"]) > 0)
+    total         = len(pols)
+    assets_vals   = [p["assets"] for p in pols if p.get("assets") is not None]
+    avg_assets_cr = round(sum(assets_vals) / len(assets_vals) / 1e7, 2) if assets_vals else None
+
+    return StateSummary(
+        state_id=state_id,
+        state_name=s["name"],
+        state_code=s["code"],
+        capital=s.get("capital"),
+        region=s.get("region"),
+        population=s.get("population"),
+        total_seats=s.get("total_seats"),
+        ruling_party=s.get("ruling_party"),
+        in_power_since=s.get("in_power_since"),
+        last_election=s.get("last_election"),
+        next_election=s.get("next_election"),
+        cm_name=cm["name"] if cm else None,
+        cm_party=cm["party"] if cm else None,
+        cm_constituency=cm["constituency"] if cm else None,
+        total_verified=total,
+        mla_count=mla_count,
+        cabinet_count=cabinet_count,
+        with_criminal_cases=with_crimes,
+        criminal_case_pct=round(with_crimes / total * 100, 1) if total else 0.0,
+        avg_assets_cr=avg_assets_cr,
+    )
 
 
 @app.get("/states/{state_id}", response_model=State, tags=["States"])

@@ -1,5 +1,10 @@
 MYNETA_BASE = "https://myneta.info"
 
+# 8 featured states — major metros, fresh election data, best coverage
+# Delhi(29) · Karnataka(11) · Tamil Nadu(23) · Telangana(24)
+# Maharashtra(14) · West Bengal(28) · Rajasthan(21) · Kerala(12)
+FEATURED_STATE_IDS: list[int] = [29, 11, 23, 24, 14, 28, 21, 12]
+
 # Most recent state assembly election per state.
 # ministers_url: state govt council-of-ministers page; None = skip minister tagging.
 _WP = "https://en.wikipedia.org/wiki/"
