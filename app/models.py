@@ -81,3 +81,4 @@ class StateSummary(BaseModel):
     with_criminal_cases: int = 0
     criminal_case_pct: float = 0.0
     avg_assets_cr: Optional[float] = None
+    party_breakdown: dict[str, int] = {}
