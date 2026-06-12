@@ -83,6 +83,11 @@ CATEGORY_KEYWORDS: dict[str, list[str]] = {
 TITLE_NOISE = {
     "shri", "smt", "dr", "prof", "sri", "adv", "hon", "the", "and", "for",
     "of", "in", "is", "to", "at", "an", "a",
+    # Very common Indian surnames — too ambiguous for single-token matching
+    "singh", "kumar", "sharma", "verma", "gupta", "reddy", "rao", "nair",
+    "pillai", "menon", "iyer", "naidu", "patel", "shah", "joshi", "mishra",
+    "pandey", "tiwari", "yadav", "dubey", "jha", "chauhan", "sinha", "roy",
+    "das", "dey", "ghosh", "bose", "sen", "chandra", "lal", "ram", "devi",
 }
 
 PIB_BASE = "https://pib.gov.in"
@@ -220,8 +225,9 @@ def match_politician(title: str, name_index: list[dict]) -> dict | None:
                 if sig_parts[i] in title_words and sig_parts[i + 1] in title_words:
                     return entry["politician"]
 
-        elif len(sig_parts) == 1 and len(sig_parts[0]) >= 5:
-            # Rule 4: single rare name (5+ chars) as a title word
+        elif len(sig_parts) == 1 and len(sig_parts[0]) >= 6:
+            # Rule 4: single rare/distinctive name (6+ chars) as a title word
+            # Requires 6+ to avoid common 5-char surnames matching unrelated people
             if sig_parts[0] in title_words:
                 return entry["politician"]
 
@@ -385,9 +391,12 @@ def process_releases(
     saved_count: dict,
     politician_names: dict,
     fetch_details: bool = True,
+    restrict_state_id: int | None = None,
 ) -> int:
     """
     Match and save achievements from a list of {title, prid, url} releases.
+    restrict_state_id: if set (state bureau), only save matches for that state's
+    politicians — prevents false positives from common names matching wrong-state MLAs.
     Returns number of new achievements saved.
     """
     new_saved = 0
@@ -398,6 +407,11 @@ def process_releases(
 
         match = match_politician(title, name_index)
         if not match:
+            continue
+
+        # State-scoping: skip if matched politician is from a different state
+        # (only applies to state bureaus, not national bureaus)
+        if restrict_state_id is not None and match.get("state_id") != restrict_state_id:
             continue
 
         pol_id = match["id"]
@@ -451,31 +465,35 @@ def scrape_bureaus(
     Scrape press releases from all regional PIB bureaus for the given states.
     Returns total new achievements saved.
     """
-    # Build list of bureaus to scrape (state bureaus + national)
-    bureau_regs: list[tuple[str, int]] = []
+    # Build list of (bureau_name, reg, restrict_state_id) tuples
+    # restrict_state_id=None for national bureaus (match any state's politician)
+    # restrict_state_id=sid for state bureaus (avoid cross-state name collisions)
+    NATIONAL_REGS = {3, NATIONAL_REG}
+    bureau_list: list[tuple[str, int, int | None]] = []
     seen_regs: set[int] = set()
     for sid in state_ids:
         if sid in STATE_BUREAU_MAP:
-            name, reg, _ = STATE_BUREAU_MAP[sid]
+            sname, reg, _ = STATE_BUREAU_MAP[sid]
             if reg not in seen_regs:
-                bureau_regs.append((name, reg))
+                restrict = None if reg in NATIONAL_REGS else sid
+                bureau_list.append((sname, reg, restrict))
                 seen_regs.add(reg)
-    # Always include national
+    # Always include national bureaus (no state restriction)
     if NATIONAL_REG not in seen_regs:
-        bureau_regs.append(("National", NATIONAL_REG))
-    # Always include Delhi national for major announcements
+        bureau_list.append(("National", NATIONAL_REG, None))
     if 3 not in seen_regs:
-        bureau_regs.append(("Delhi National", 3))
+        bureau_list.append(("Delhi National", 3, None))
 
     total_new = 0
-    for bureau_name, reg in bureau_regs:
+    for bureau_name, reg, restrict_sid in bureau_list:
         print(f"\nScraping PIB {bureau_name} (reg={reg})...")
         releases = fetch_bureau_listings(reg)
         print(f"  Found {len(releases)} releases")
         if releases:
             new = process_releases(
                 releases, name_index, existing_keys, db,
-                saved_count, politician_names
+                saved_count, politician_names,
+                restrict_state_id=restrict_sid,
             )
             total_new += new
             print(f"  -> {new} new achievements saved")
