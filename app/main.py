@@ -15,7 +15,9 @@ from app.models import (
     PaginatedPoliticians,
     Politician,
     PoliticianDetail,
+    PoliticianPageData,
     State,
+    StatePageData,
     StateSummary,
 )
 from app.scraper import scrape_pib_releases, scrape_myneta_politician
@@ -353,6 +355,109 @@ def get_achievements(
     except APIError as exc:
         raise _db_error(exc)
     return {"total": result.count or 0, "items": result.data or []}
+
+
+# ---------------------------------------------------------------------------
+# Combined page-data endpoints (reduce frontend round trips to 1)
+# ---------------------------------------------------------------------------
+
+@app.get("/states/{state_id}/page-data", response_model=StatePageData, tags=["States"])
+@limiter.limit("60/minute")
+def get_state_page_data(request: Request, state_id: int):
+    """
+    Single call for the state page: summary stats + CM + first 24 politicians.
+    Replaces 3 separate frontend requests. Cached per state for 5 minutes.
+    """
+    cache_key = f"state_page_{state_id}"
+    cached = _cache_get(cache_key)
+    if cached is not None:
+        return cached
+
+    db = get_db()
+    try:
+        state_res = db.table("states").select("*").eq("id", state_id).limit(1).execute()
+    except APIError as exc:
+        raise _db_error(exc)
+    if not state_res.data:
+        raise HTTPException(status_code=404, detail="State not found")
+    state = state_res.data[0]
+
+    try:
+        pols_res = (
+            db.table("verified_politicians")
+            .select("*", count="exact")
+            .eq("state_id", state_id)
+            .order("name")
+            .execute()
+        )
+    except APIError as exc:
+        raise _db_error(exc)
+
+    all_pols = pols_res.data or []
+    total    = pols_res.count or 0
+    summary  = _compute_summary(state, all_pols)
+    cm       = next((p for p in all_pols if p.get("position") == "Chief Minister"), None)
+
+    result = StatePageData(
+        summary=summary,
+        cm=cm,
+        politicians={"total": total, "items": all_pols[:24]},
+    )
+    _cache_set(cache_key, result)
+    return result
+
+
+@app.get("/politicians/{politician_id}/page-data", response_model=PoliticianPageData, tags=["Politicians"])
+@limiter.limit("60/minute")
+def get_politician_page_data(request: Request, politician_id: int):
+    """
+    Single call for the politician page: full profile + state + achievements + 4 related politicians.
+    Replaces 2 separate frontend requests. Cached per politician for 5 minutes.
+    """
+    cache_key = f"pol_page_{politician_id}"
+    cached = _cache_get(cache_key)
+    if cached is not None:
+        return cached
+
+    db = get_db()
+    try:
+        pol_res = db.table("verified_politicians").select("*").eq("id", politician_id).limit(1).execute()
+    except APIError as exc:
+        raise _db_error(exc)
+    if not pol_res.data:
+        raise HTTPException(status_code=404, detail="Politician not found")
+
+    p = pol_res.data[0]
+    try:
+        state_res   = db.table("states").select("*").eq("id", p["state_id"]).limit(1).execute()
+        ach_res     = (
+            db.table("achievements").select("*")
+            .eq("politician_id", politician_id)
+            .order("published_date", desc=True)
+            .execute()
+        )
+        related_res = (
+            db.table("verified_politicians").select("*")
+            .eq("state_id", p["state_id"])
+            .neq("id", politician_id)
+            .order("name")
+            .limit(4)
+            .execute()
+        )
+    except APIError as exc:
+        raise _db_error(exc)
+
+    politician = {
+        **p,
+        "state":        state_res.data[0] if state_res.data else None,
+        "achievements": ach_res.data or [],
+    }
+    result = PoliticianPageData(
+        politician=politician,
+        related=related_res.data or [],
+    )
+    _cache_set(cache_key, result)
+    return result
 
 
 # ---------------------------------------------------------------------------

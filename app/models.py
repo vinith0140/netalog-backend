@@ -70,6 +70,17 @@ class PaginatedAchievements(BaseModel):
     items: list["Achievement"]
 
 
+class StatePageData(BaseModel):
+    summary: "StateSummary"
+    cm: Optional[Politician] = None
+    politicians: PaginatedPoliticians
+
+
+class PoliticianPageData(BaseModel):
+    politician: PoliticianDetail
+    related: list[Politician] = []
+
+
 class StateSummary(BaseModel):
     state_id: int
     state_name: str
