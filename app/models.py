@@ -60,6 +60,16 @@ class PoliticianDetail(Politician):
     achievements: list[Achievement] = []
 
 
+class PaginatedPoliticians(BaseModel):
+    total: int
+    items: list["Politician"]
+
+
+class PaginatedAchievements(BaseModel):
+    total: int
+    items: list["Achievement"]
+
+
 class StateSummary(BaseModel):
     state_id: int
     state_name: str
