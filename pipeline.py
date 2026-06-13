@@ -2,10 +2,10 @@
 pipeline.py
 Full NetaLog automated pipeline:
 
-  Step 1 — run_scraper.py       : scrape all 30 states from MyNeta
-  Step 2 — fix_cm_tags.py       : tag CMs, Cabinet Ministers, MLAs
-  Step 3 — verify_politicians.py: 3-source CM validation + auto-fix + copy to verified_politicians
-  Step 4 — verify_mlas.py       : verify MLAs from Wikipedia, copy to verified_politicians
+  Step 1 — run_scraper.py : scrape all 30 states from MyNeta
+  Step 2 — fix_cm_tags.py : tag CMs / Cabinet Ministers / MLAs from Wikipedia ministry pages
+  Step 3 — verify_mlas.py : verify MLAs + CMs from Wikipedia election results,
+                            copy to verified_politicians
 
 Prints a summary with timing and counts at the end.
 """
@@ -17,9 +17,8 @@ import time
 from datetime import datetime
 
 STEPS = [
-    ("Scrape MyNeta (all 30 states)", "run_scraper.py"),
-    ("Tag CMs / Cabinet Ministers / MLAs", "fix_cm_tags.py"),
-    ("Verify CMs — 3-source consensus", "verify_politicians.py"),
+    ("Scrape MyNeta (all 30 states)",        "run_scraper.py"),
+    ("Tag CMs / Cabinet Ministers / MLAs",   "fix_cm_tags.py"),
     ("Verify MLAs — Wikipedia election results", "verify_mlas.py"),
 ]
 
@@ -32,14 +31,9 @@ COUNT_PATTERNS = {
     "fix_cm_tags.py": [
         (r"Chief\s+Ministers?\s+tagged[^\d]*(\d+)", "cms_tagged"),
     ],
-    "verify_politicians.py": [
-        (r"VERIFIED\s+:\s+(\d+)",        "cm_verified"),
-        (r"FIXED\s+:\s+(\d+)",           "cm_fixed"),
-        (r"NEEDS MANUAL REVIEW\s*:\s+(\d+)", "cm_review"),
-    ],
     "verify_mlas.py": [
-        (r"Total verified\s*:\s*(\d+)",  "mla_verified"),
-        (r"Total flagged\s*:\s*(\d+)",   "mla_flagged"),
+        (r"Total verified\s*:\s*(\d+)", "mla_verified"),
+        (r"Total flagged\s*:\s*(\d+)",  "mla_flagged"),
     ],
 }
 
@@ -130,16 +124,10 @@ def main():
 
     if "scraped" in all_counts:
         print(f"  Politicians scraped  : {all_counts['scraped']}")
-    if "cm_verified" in all_counts:
-        print(f"  CMs verified         : {all_counts['cm_verified']}/30")
-    if "cm_fixed" in all_counts:
-        print(f"  CMs auto-fixed       : {all_counts['cm_fixed']}")
-    if "cm_review" in all_counts:
-        print(f"  CMs needs review     : {all_counts['cm_review']}")
     if "mla_verified" in all_counts:
-        print(f"  MLAs verified        : {all_counts['mla_verified']}")
+        print(f"  Verified to DB       : {all_counts['mla_verified']}")
     if "mla_flagged" in all_counts:
-        print(f"  MLAs flagged         : {all_counts['mla_flagged']}")
+        print(f"  Flagged (no match)   : {all_counts['mla_flagged']}")
 
     print()
     if failed:
