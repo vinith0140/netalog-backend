@@ -9,7 +9,7 @@ from app.scraper import _get, _parse_rupees
 from app.database import get_db
 
 HONORIFICS = re.compile(r"^(Sri|Smt\.|Dr\.|Shri|Shrimati|Mr\.|Mrs\.|Sh\.)\s+", re.IGNORECASE)
-RESERVATION = re.compile(r"\s*\((SC|ST|OBC)\)\s*$", re.IGNORECASE)
+RESERVATION = re.compile(r"\s*[\(\[]?\s*(SC|ST|OBC)\s*[\)\]]?\s*$", re.IGNORECASE)
 
 
 # ── Candidates ────────────────────────────────────────────────────────────────
@@ -114,7 +114,7 @@ def scrape_candidates(base_url: str, state_id: int) -> tuple[int, int]:
                     "name": name,
                     "party": _cell(cells, "party") or "Unknown",
                     "state_id": state_id,
-                    "constituency": const_name,
+                    "constituency": RESERVATION.sub("", const_name).strip(),
                     "education": _cell(cells, "education") or None,
                     "age": age,
                     "criminal_cases": criminal_cases,

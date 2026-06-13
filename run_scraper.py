@@ -92,7 +92,7 @@ def tag_winners_and_ministers():
 
     HONORIFICS = re.compile(r"^(Sri|Smt\.|Dr\.|Shri|Shrimati)\s+", re.IGNORECASE)
     # Strip reservation suffixes like "(SC)" or "(ST)" from constituency names
-    RESERVATION = re.compile(r"\s*\((SC|ST|OBC)\)\s*$", re.IGNORECASE)
+    RESERVATION = re.compile(r"\s*[\(\[]?\s*(SC|ST|OBC)\s*[\)\]]?\s*$", re.IGNORECASE)
 
     ministers: list[dict] = []
     for table in soup.find_all("table"):
