@@ -19,6 +19,7 @@ from app.models import (
     State,
     StatePageData,
     StateSummary,
+    TimelineEvent,
 )
 from app.scraper import scrape_pib_releases, scrape_myneta_politician
 from app.state_config import FEATURED_STATE_IDS
@@ -318,17 +319,28 @@ def get_politician(request: Request, politician_id: int):
 
     p = pol_res.data[0]
     try:
-        state_res = db.table("states").select("*").eq("id", p["state_id"]).limit(1).execute()
-        ach_res   = (
+        state_res    = db.table("states").select("*").eq("id", p["state_id"]).limit(1).execute()
+        ach_res      = (
             db.table("achievements").select("*")
             .eq("politician_id", politician_id)
             .order("published_date", desc=True)
             .execute()
         )
+        timeline_res = (
+            db.table("timeline_events").select("*")
+            .eq("politician_id", politician_id)
+            .order("year")
+            .execute()
+        )
     except APIError as exc:
         raise _db_error(exc)
 
-    return {**p, "state": state_res.data[0] if state_res.data else None, "achievements": ach_res.data or []}
+    return {
+        **p,
+        "state":        state_res.data[0] if state_res.data else None,
+        "achievements": ach_res.data or [],
+        "timeline":     timeline_res.data or [],
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -436,12 +448,18 @@ def get_politician_page_data(request: Request, politician_id: int):
             .order("published_date", desc=True)
             .execute()
         )
-        related_res = (
+        related_res  = (
             db.table("verified_politicians").select("*")
             .eq("state_id", p["state_id"])
             .neq("id", politician_id)
             .order("name")
             .limit(4)
+            .execute()
+        )
+        timeline_res = (
+            db.table("timeline_events").select("*")
+            .eq("politician_id", politician_id)
+            .order("year")
             .execute()
         )
     except APIError as exc:
@@ -451,6 +469,7 @@ def get_politician_page_data(request: Request, politician_id: int):
         **p,
         "state":        state_res.data[0] if state_res.data else None,
         "achievements": ach_res.data or [],
+        "timeline":     timeline_res.data or [],
     }
     result = PoliticianPageData(
         politician=politician,
@@ -458,6 +477,27 @@ def get_politician_page_data(request: Request, politician_id: int):
     )
     _cache_set(cache_key, result)
     return result
+
+
+# ---------------------------------------------------------------------------
+# Timeline events
+# ---------------------------------------------------------------------------
+
+@app.get("/politicians/{politician_id}/timeline", response_model=list[TimelineEvent], tags=["Politicians"])
+@limiter.limit("60/minute")
+def get_politician_timeline(request: Request, politician_id: int):
+    """Career timeline, achievements and portfolios for a politician."""
+    db = get_db()
+    try:
+        rows = (
+            db.table("timeline_events").select("*")
+            .eq("politician_id", politician_id)
+            .order("year")
+            .execute()
+        )
+    except APIError as exc:
+        raise _db_error(exc)
+    return rows.data or []
 
 
 # ---------------------------------------------------------------------------

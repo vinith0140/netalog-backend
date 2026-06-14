@@ -42,6 +42,21 @@ class Politician(BaseModel):
         from_attributes = True
 
 
+class TimelineEvent(BaseModel):
+    id: int
+    politician_id: int
+    type: str
+    year: Optional[int] = None
+    title: str
+    short_description: Optional[str] = None
+    source_url: Optional[str] = None
+    source_name: Optional[str] = None
+    confidence: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+
 class Achievement(BaseModel):
     id: int
     politician_id: int
@@ -58,6 +73,7 @@ class Achievement(BaseModel):
 class PoliticianDetail(Politician):
     state: Optional[State] = None
     achievements: list[Achievement] = []
+    timeline: list[TimelineEvent] = []
 
 
 class PaginatedPoliticians(BaseModel):

@@ -10,16 +10,19 @@ Full NetaLog automated pipeline:
 Prints a summary with timing and counts at the end.
 """
 
+import os
 import re
 import subprocess
 import sys
 import time
 from datetime import datetime
 
+_DIR = os.path.dirname(os.path.abspath(__file__))
+
 STEPS = [
-    ("Scrape MyNeta (all 30 states)",        "run_scraper.py"),
-    ("Tag CMs / Cabinet Ministers / MLAs",   "fix_cm_tags.py"),
-    ("Verify MLAs — Wikipedia election results", "verify_mlas.py"),
+    ("Scrape MyNeta (all 30 states)",            os.path.join(_DIR, "run_scraper.py")),
+    ("Tag CMs / Cabinet Ministers / MLAs",       os.path.join(_DIR, "fix_cm_tags.py")),
+    ("Verify MLAs — Wikipedia election results", os.path.join(_DIR, "verify_mlas.py")),
 ]
 
 # Patterns to extract counts from each script's stdout
