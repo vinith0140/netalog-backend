@@ -554,4 +554,34 @@ def run_state_pipeline(state: dict, fallback_slugs: list[str] | None = None) -> 
         except Exception as exc:
             result["ministers_error"] = str(exc)
 
+    # ── Sync state metadata from pipeline results ─────────────────────────────
+    # Keeps ruling_party / last_election / next_election in sync automatically
+    # so the states table never goes stale after an election.
+    try:
+        db = get_db()
+        cm_res = (
+            db.table("politicians")
+            .select("party")
+            .eq("state_id", state["state_id"])
+            .eq("position", "Chief Minister")
+            .limit(1)
+            .execute()
+        )
+        year_m = re.search(r"(\d{4})$", state["myneta_slug"])
+        election_year = int(year_m.group(1)) if year_m else None
+
+        updates: dict = {}
+        if cm_res.data:
+            updates["ruling_party"] = cm_res.data[0]["party"]
+        if election_year:
+            updates["last_election"]  = election_year
+            updates["next_election"]  = election_year + 5
+            updates["in_power_since"] = election_year
+
+        if updates:
+            db.table("states").update(updates).eq("id", state["state_id"]).execute()
+            result["state_meta_updated"] = list(updates.keys())
+    except Exception as exc:
+        result["state_meta_error"] = str(exc)
+
     return result
