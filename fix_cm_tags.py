@@ -19,7 +19,7 @@ load_dotenv()
 
 from app.database import get_db
 from app.state_config import STATE_PIPELINES
-from app.pipeline import tag_ministers
+from app.pipeline import tag_ministers, sync_state_metadata
 
 # ── Step 1: Reset all Chief Ministers -> Cabinet Minister ─────────────────────
 print("=" * 60)
@@ -140,3 +140,17 @@ print(f"CMs tagged   : {len(found)}/{len(cm_results)}")
 print(f"States missed: {len(not_found)}")
 if not_found:
     print(f"  Missing: {', '.join(r['name'] for r in not_found)}")
+
+# ── Sync states table metadata for all processed states ───────────────────────
+print()
+print("=" * 60)
+print("STEP 4: Sync states table (ruling_party / last_election / next_election)")
+print("=" * 60)
+
+for state in STATE_PIPELINES:
+    try:
+        updated = sync_state_metadata(state["state_id"], state["myneta_slug"])
+        if updated:
+            print(f"  [{state['state_id']:2d}] {state['name']:<25} → {updated}")
+    except Exception as exc:
+        print(f"  [{state['state_id']:2d}] {state['name']:<25} ERROR: {exc}")
